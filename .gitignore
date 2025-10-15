@@ -56,3 +56,5 @@ yarn.lock
 pnpm-lock.yaml
 # If you use package-lock.json and want to keep it, remove the next line
 package-lock.json
+
+supabase/
