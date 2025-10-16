@@ -4,6 +4,7 @@ import { createContext, useContext, useEffect, useState } from "react";
 import { User } from "@supabase/supabase-js";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
+import type { Database } from "@/lib/database.types";
 
 interface AuthContextType {
     user: User | null;
@@ -46,13 +47,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     ) => {
         const { data, error } = await supabase.auth.signUp({ email, password });
         if (!error && data.user) {
-            const { error: profileError } = await supabase
+            const now = new Date().toISOString();
+            const profile = {
+                id: data.user.id,
+                email: data.user.email!,
+                full_name: fullName ?? null,
+                created_at: now,
+                updated_at: now,
+            };
+            const { error: profileError } = await (supabase as any)
                 .from("profiles")
-                .insert({
-                    id: data.user.id,
-                    email: data.user.email!,
-                    full_name: fullName,
-                });
+                .upsert([profile], { onConflict: "id" });
+
             if (!profileError) router.push("/dashboard");
             return { error: profileError };
         }

@@ -1,5 +1,3 @@
-// app/page.tsx
-
 import HeroSection from "@/components/landing-page/HeroSection";
 import FeaturesSection from "@/components/landing-page/FeaturesSection";
 import FinalCTASection from "@/components/landing-page/FinalCTASection";

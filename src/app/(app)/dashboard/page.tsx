@@ -1,15 +1,26 @@
-import React from "react";
+import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
+import { cookies } from "next/headers";
+import { Database } from "@/lib/database.types";
+import KanbanBoard from "@/components/dashboard/kanban/KanbanBoard";
 
-const DashboardPage = () => {
-    return (
-        <main className="p-6">
-            <h1 className="text-2xl font-bold mb-4">Tableau de bord</h1>
-            <section>
-                <p>Bienvenue sur votre tableau de bord !</p>
-                {/* Ajoutez ici les composants et données du dashboard */}
-            </section>
-        </main>
-    );
-};
+async function getApplications() {
+    const supabase = createServerComponentClient<Database>({ cookies });
+    const {
+        data: { session },
+    } = await supabase.auth.getSession();
+    if (!session) return [];
 
-export default DashboardPage;
+    const { data, error } = await supabase
+        .from("applications")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+    if (error) return [];
+    return data;
+}
+
+export default async function DashboardPage() {
+    const initialApplications = await getApplications();
+
+    return <KanbanBoard initialApplications={initialApplications} />;
+}
