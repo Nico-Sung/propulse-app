@@ -5,6 +5,7 @@ import { supabase } from "@/lib/supabaseClient";
 import { useAuth } from "@/contexts/AuthContext";
 import { Database } from "@/lib/database.types";
 import { ApplicationCard } from "./ApplicationCard";
+import { EditApplicationSheet } from "./EditApplicationModal";
 import { AddApplicationDialog } from "./AddApplicationDialog";
 import {
     DndContext,
@@ -65,6 +66,9 @@ export default function KanbanBoard({
     };
 
     const [activeId, setActiveId] = useState<UniqueIdentifier | null>(null);
+    const [selectedApplication, setSelectedApplication] =
+        useState<Application | null>(null);
+    const [isSheetOpen, setIsSheetOpen] = useState(false);
 
     const itemsByColumn = useMemo(() => {
         const map: Record<string, UniqueIdentifier[]> = {};
@@ -183,7 +187,12 @@ export default function KanbanBoard({
                                                 <ApplicationCard
                                                     key={app.id}
                                                     application={app}
-                                                    onCardClick={() => {}}
+                                                    onCardClick={() => {
+                                                        setSelectedApplication(
+                                                            app
+                                                        );
+                                                        setIsSheetOpen(true);
+                                                    }}
                                                 />
                                             ))}
                                         </div>
@@ -195,6 +204,14 @@ export default function KanbanBoard({
                 </div>
 
                 <AddApplicationDialog />
+                <EditApplicationSheet
+                    application={selectedApplication}
+                    isOpen={isSheetOpen}
+                    onClose={() => setIsSheetOpen(false)}
+                    onUpdate={async () => {
+                        await loadApplications();
+                    }}
+                />
                 <DragOverlay>
                     {activeApplication ? (
                         <OverlayCard application={activeApplication} />
@@ -217,12 +234,12 @@ function Column({
     const { setNodeRef, isOver } = useDroppable({ id: column.id });
     return (
         <div ref={setNodeRef} className="flex-shrink-0 w-80 flex flex-col">
-            <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-4 mb-3">
+            <div className="bg-surface rounded-lg shadow-sm border border-default p-4 mb-3">
                 <div className="flex items-center justify-between">
-                    <h3 className="font-semibold text-slate-800">
+                    <h3 className="font-semibold text-foreground">
                         {column.label}
                     </h3>
-                    <span className="bg-slate-200 text-slate-700 text-xs font-semibold px-2 py-1 rounded-full">
+                    <span className="bg-muted text-foreground text-xs font-semibold px-2 py-1 rounded-full">
                         {items?.length || 0}
                     </span>
                 </div>
@@ -244,12 +261,12 @@ function Column({
 function OverlayCard({ application }: { application: Application }) {
     return (
         <div className="w-80">
-            <div className="bg-white rounded-lg shadow-md border border-slate-200 p-4">
+            <div className="bg-surface rounded-lg shadow-md border border-default p-4">
                 <div>
                     <div className="font-semibold text-base">
                         {application.position_title}
                     </div>
-                    <div className="text-sm text-slate-600">
+                    <div className="text-sm text-muted">
                         {application.company_name}
                     </div>
                 </div>

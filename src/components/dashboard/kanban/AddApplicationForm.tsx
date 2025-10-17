@@ -25,6 +25,7 @@ import {
     FormMessage,
 } from "@/components/ui/form";
 import { toast } from "sonner";
+import { is } from "zod/v4/locales";
 
 const applicationSchema = z.object({
     id: z.string().optional(),
@@ -73,9 +74,7 @@ export default function AddApplicationForm({
 
     async function onSubmit(values: ApplicationFormValues) {
         form.resetField("id");
-
         try {
-            // Récupère l'utilisateur côté client (localStorage session)
             const {
                 data: { user },
                 error: userError,
@@ -91,7 +90,6 @@ export default function AddApplicationForm({
                 return;
             }
 
-            // Génère un id si nécessaire
             const id =
                 values.id ??
                 (typeof crypto !== "undefined"
@@ -117,7 +115,7 @@ export default function AddApplicationForm({
                 updated_at: new Date().toISOString(),
             };
 
-            const { data, error } = await supabase
+            const { data, error } = await (supabase as any)
                 .from("applications")
                 .insert([insertObj])
                 .select()
@@ -129,9 +127,43 @@ export default function AddApplicationForm({
                 return;
             }
 
+            try {
+                const defaultTasks = [
+                    "Personnaliser le CV",
+                    "Rédiger la lettre de motivation",
+                    "Envoyer la candidature",
+                ];
+
+                if (data?.id) {
+                    const { error: tasksError } = await (supabase as any)
+                        .from("tasks")
+                        .insert(
+                            defaultTasks.map((title, index) => ({
+                                application_id: data.id,
+                                title,
+                                order: index,
+                                is_completed: false,
+                                created_at: new Date().toISOString(),
+                            }))
+                        );
+
+                    if (tasksError) {
+                        console.error(
+                            "Error inserting default tasks:",
+                            tasksError
+                        );
+                    }
+                }
+            } catch (taskInsertErr) {
+                console.error(
+                    "Unexpected error inserting tasks:",
+                    taskInsertErr
+                );
+            }
+
             toast.success("Candidature créée avec succès !");
             setOpen(false);
-            router.refresh(); // rafraîchir les server components (dashboard)
+            router.refresh();
             form.reset();
         } catch (err: any) {
             console.error(err);
@@ -258,7 +290,13 @@ export default function AddApplicationForm({
                             <FormItem>
                                 <FormLabel>Date de candidature</FormLabel>
                                 <FormControl>
-                                    <Input type="date" {...field} />
+                                    <Input
+                                        type="date"
+                                        value={field.value ?? ""}
+                                        onChange={(e) =>
+                                            field.onChange(e.target.value)
+                                        }
+                                    />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
@@ -271,7 +309,13 @@ export default function AddApplicationForm({
                             <FormItem>
                                 <FormLabel>Deadline</FormLabel>
                                 <FormControl>
-                                    <Input type="date" {...field} />
+                                    <Input
+                                        type="date"
+                                        value={field.value ?? ""}
+                                        onChange={(e) =>
+                                            field.onChange(e.target.value)
+                                        }
+                                    />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
@@ -286,7 +330,13 @@ export default function AddApplicationForm({
                         <FormItem>
                             <FormLabel>Date d'entretien</FormLabel>
                             <FormControl>
-                                <Input type="date" {...field} />
+                                <Input
+                                    type="date"
+                                    value={field.value ?? ""}
+                                    onChange={(e) =>
+                                        field.onChange(e.target.value)
+                                    }
+                                />
                             </FormControl>
                             <FormMessage />
                         </FormItem>

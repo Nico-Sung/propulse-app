@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState } from "react";
@@ -11,7 +10,7 @@ import {
     DialogTrigger,
 } from "@/components/ui/dialog";
 import { Plus } from "lucide-react";
-import AddApplicationForm from "../AddApplicationForm";
+import AddApplicationForm from "./AddApplicationForm";
 
 export function AddApplicationDialog() {
     const [open, setOpen] = useState(false);
@@ -25,7 +24,7 @@ export function AddApplicationDialog() {
             </DialogTrigger>
             <DialogContent className="sm:max-w-[650px]">
                 <DialogHeader>
-                    <DialogTitle>Ajouter une opportunité</DialogTitle>
+                    <DialogTitle>Ajouter une Candidature</DialogTitle>
                 </DialogHeader>
                 <div className="py-4">
                     <AddApplicationForm setOpen={setOpen} />

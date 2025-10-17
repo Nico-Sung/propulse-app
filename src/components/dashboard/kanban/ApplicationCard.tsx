@@ -44,7 +44,7 @@ export function ApplicationCard({
                         size="icon"
                         className="absolute top-2 right-2 h-7 w-7 opacity-0 group-hover:opacity-100"
                     >
-                        <Trash2 className="h-4 w-4 text-slate-500 hover:text-destructive" />
+                        <Trash2 className="h-4 w-4 text-muted hover:text-destructive" />
                     </Button>
                 </CardHeader>
             </Card>
