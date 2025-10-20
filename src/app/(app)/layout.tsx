@@ -94,9 +94,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                 </div>
             </header>
 
-            <nav className="bg-white border-b border-slate-200 px-6">
+            <nav className="bg-none border-b border-slate-200 px-6 ">
                 <Tabs value={activeTabValue} onValueChange={handleNavigate}>
-                    <TabsList>
+                    <TabsList className="bg-none-important">
                         <TabsTrigger value="dashboard">Pipeline</TabsTrigger>
                         <TabsTrigger value="actions" disabled>
                             Actions du jour
