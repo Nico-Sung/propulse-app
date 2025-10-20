@@ -3,7 +3,15 @@
 import { useAuth } from "@/contexts/AuthContext";
 import { useRouter, usePathname } from "next/navigation";
 import { useEffect } from "react";
-import { Briefcase, LogOut } from "lucide-react";
+import {
+    BarChart2,
+    BarChart3,
+    Briefcase,
+    Calendar,
+    CheckSquare,
+    LayoutDashboard,
+    LogOut,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
@@ -97,12 +105,21 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             <nav className="bg-none border-b border-slate-200 px-6 ">
                 <Tabs value={activeTabValue} onValueChange={handleNavigate}>
                     <TabsList className="bg-none-important">
-                        <TabsTrigger value="dashboard">Pipeline</TabsTrigger>
+                        <TabsTrigger value="dashboard">
+                            <LayoutDashboard /> Pipeline
+                        </TabsTrigger>
                         <TabsTrigger value="actions" disabled>
+                            <CheckSquare />
                             Actions du jour
                         </TabsTrigger>
-                        <TabsTrigger value="calendar">Calendrier</TabsTrigger>
-                        <TabsTrigger value="analytics">Analyse</TabsTrigger>
+                        <TabsTrigger value="calendar">
+                            <Calendar />
+                            Calendrier
+                        </TabsTrigger>
+                        <TabsTrigger value="analytics">
+                            <BarChart3 />
+                            Analyse
+                        </TabsTrigger>
                     </TabsList>
                 </Tabs>
             </nav>
