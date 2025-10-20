@@ -5,8 +5,8 @@ import { supabase } from "@/lib/supabaseClient";
 import { useAuth } from "@/contexts/AuthContext";
 import { Database } from "@/lib/database.types";
 import { ApplicationCard } from "./ApplicationCard";
-import { EditApplicationSheet } from "./EditApplicationModal";
-import { AddApplicationDialog } from "./AddApplicationDialog";
+import { EditApplicationSheet } from "./modal/EditApplicationModal";
+import { AddApplicationDialog } from "./modal/AddApplicationModal";
 import {
     DndContext,
     DragEndEvent,
@@ -23,7 +23,8 @@ import {
     rectSortingStrategy,
     arrayMove,
 } from "@dnd-kit/sortable";
-import { useDroppable } from "@dnd-kit/core";
+import { KanbanColumn } from "./KanbanColumn";
+import { OverlayCard } from "@/components/design-system/overlay-card";
 
 type Application = Database["public"]["Tables"]["applications"]["Row"];
 
@@ -163,15 +164,15 @@ export default function KanbanBoard({
             onDragStart={handleDragStart}
             onDragEnd={handleDragEnd}
         >
-            <div className="h-full flex flex-col">
+            <div className=" flex flex-col ">
                 <div className="flex-1 overflow-x-auto p-6">
-                    <div className="flex gap-4 min-w-max h-full">
+                    <div className="flex gap-4 min-w-max">
                         {COLUMNS.map((column) => {
                             const columnApps = applications.filter(
                                 (app) => app.status === column.id
                             );
                             return (
-                                <Column
+                                <KanbanColumn
                                     key={column.id}
                                     column={column}
                                     items={itemsByColumn[column.id]}
@@ -181,7 +182,7 @@ export default function KanbanBoard({
                                         strategy={rectSortingStrategy}
                                     >
                                         <div
-                                            className={`flex-1 ${column.color} rounded-lg p-3 space-y-3 min-h-[200px]`}
+                                            className={`flex-1 ${column.color} rounded-lg p-3 space-y-3 min-h-max`}
                                         >
                                             {columnApps.map((app) => (
                                                 <ApplicationCard
@@ -197,7 +198,7 @@ export default function KanbanBoard({
                                             ))}
                                         </div>
                                     </SortableContext>
-                                </Column>
+                                </KanbanColumn>
                             );
                         })}
                     </div>
@@ -214,63 +215,14 @@ export default function KanbanBoard({
                 />
                 <DragOverlay>
                     {activeApplication ? (
-                        <OverlayCard application={activeApplication} />
+                        <OverlayCard
+                            title={activeApplication.position_title}
+                            subtitle={activeApplication.company_name}
+                            widthClass="w-80"
+                        />
                     ) : null}
                 </DragOverlay>
             </div>
         </DndContext>
-    );
-}
-
-function Column({
-    column,
-    items,
-    children,
-}: {
-    column: (typeof COLUMNS)[number];
-    items?: UniqueIdentifier[];
-    children: React.ReactNode;
-}) {
-    const { setNodeRef, isOver } = useDroppable({ id: column.id });
-    return (
-        <div ref={setNodeRef} className="flex-shrink-0 w-80 flex flex-col">
-            <div className="bg-surface rounded-lg shadow-sm border border-default p-4 mb-3">
-                <div className="flex items-center justify-between">
-                    <h3 className="font-semibold text-foreground">
-                        {column.label}
-                    </h3>
-                    <span className="bg-muted text-foreground text-xs font-semibold px-2 py-1 rounded-full">
-                        {items?.length || 0}
-                    </span>
-                </div>
-            </div>
-
-            <div
-                className={`flex-1 ${
-                    column.color
-                } rounded-lg p-3 space-y-3 min-h-[200px] ${
-                    isOver ? "ring-2 ring-teal-300" : ""
-                }`}
-            >
-                {children}
-            </div>
-        </div>
-    );
-}
-
-function OverlayCard({ application }: { application: Application }) {
-    return (
-        <div className="w-80">
-            <div className="bg-surface rounded-lg shadow-md border border-default p-4">
-                <div>
-                    <div className="font-semibold text-base">
-                        {application.position_title}
-                    </div>
-                    <div className="text-sm text-muted">
-                        {application.company_name}
-                    </div>
-                </div>
-            </div>
-        </div>
     );
 }

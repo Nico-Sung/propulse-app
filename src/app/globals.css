@@ -121,7 +121,6 @@
     }
 }
 
-/* Semantic utilities mapping to design tokens - helps components follow global CSS variables */
 @layer components {
     .bg-surface {
         background-color: var(--color-card);

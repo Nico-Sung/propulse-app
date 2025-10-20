@@ -3,10 +3,10 @@
 import { useState } from "react";
 import { Database } from "@/lib/database.types";
 import { FileText, CheckSquare, Clock, User } from "lucide-react";
-import { TasksTab } from "./details/TasksTab";
-import { HistoryTab } from "./details/HistoryTab";
-import { ContactsTab } from "./details/ContactsTab";
-import { InfoTab } from "./details/InfoTab";
+import { TasksTab } from "../details/TasksTab";
+import { HistoryTab } from "../details/HistoryTab";
+import { ContactsTab } from "../details/ContactsTab";
+import { InfoTab } from "../details/InfoTab";
 import {
     Dialog,
     DialogContent,

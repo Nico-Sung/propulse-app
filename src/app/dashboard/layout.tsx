@@ -15,6 +15,10 @@ import {
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
+    DashboardTabProvider,
+    useDashboardTab,
+} from "@/contexts/DashboardTabContext";
+import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
@@ -27,7 +31,6 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 export default function AppLayout({ children }: { children: React.ReactNode }) {
     const { user, signOut, loading } = useAuth();
     const router = useRouter();
-    const pathname = usePathname();
 
     useEffect(() => {
         if (!loading && !user) {
@@ -43,11 +46,29 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         );
     }
 
-    const handleNavigate = (path: string) => {
-        router.push(path);
-    };
+    return (
+        <DashboardTabProvider>
+            <ShellLayout>{children}</ShellLayout>
+        </DashboardTabProvider>
+    );
+}
 
-    const activeTabValue = pathname.split("/").pop() || "dashboard";
+function ShellLayout({ children }: { children: React.ReactNode }) {
+    const { tab, setTab } = useDashboardTab();
+    const { user, signOut } = useAuth();
+    const router = useRouter();
+    const pathname = usePathname();
+
+    useEffect(() => {
+        const active = (pathname.split("/").pop() as any) || "dashboard";
+        if (active && active !== tab) {
+            setTab(active);
+        }
+    }, [pathname]);
+
+    const handleNavigate = (value: string) => {
+        setTab(value as any);
+    };
 
     return (
         <div className="h-screen flex flex-col bg-slate-50">
@@ -75,7 +96,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                                 <Avatar className="h-9 w-9">
                                     <AvatarImage src="" alt="Avatar" />
                                     <AvatarFallback>
-                                        {user.email?.charAt(0).toUpperCase()}
+                                        {user?.email
+                                            ? user.email.charAt(0).toUpperCase()
+                                            : "U"}
                                     </AvatarFallback>
                                 </Avatar>
                             </Button>
@@ -88,7 +111,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                             <DropdownMenuLabel className="font-normal">
                                 <div className="flex flex-col space-y-1">
                                     <p className="text-sm font-medium leading-none">
-                                        {user.email}
+                                        {user?.email ?? "Utilisateur"}
                                     </p>
                                 </div>
                             </DropdownMenuLabel>
@@ -103,12 +126,12 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             </header>
 
             <nav className="bg-none border-b border-slate-200 px-6 ">
-                <Tabs value={activeTabValue} onValueChange={handleNavigate}>
+                <Tabs value={tab} onValueChange={handleNavigate}>
                     <TabsList className="bg-none-important">
                         <TabsTrigger value="dashboard">
                             <LayoutDashboard /> Pipeline
                         </TabsTrigger>
-                        <TabsTrigger value="actions" disabled>
+                        <TabsTrigger value="actions">
                             <CheckSquare />
                             Actions du jour
                         </TabsTrigger>

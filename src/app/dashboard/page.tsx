@@ -1,7 +1,7 @@
 import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
 import { cookies } from "next/headers";
 import { Database } from "@/lib/database.types";
-import KanbanBoard from "@/components/dashboard/kanban/KanbanBoard";
+import DashboardShell from "@/components/dashboard/DashboardShell";
 
 async function getApplications() {
     const supabase = createServerComponentClient<Database>({ cookies });
@@ -22,5 +22,5 @@ async function getApplications() {
 export default async function DashboardPage() {
     const initialApplications = await getApplications();
 
-    return <KanbanBoard initialApplications={initialApplications} />;
+    return <DashboardShell initialApplications={initialApplications} />;
 }
