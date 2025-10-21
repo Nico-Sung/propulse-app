@@ -4,7 +4,6 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useRouter, usePathname } from "next/navigation";
 import { useEffect } from "react";
 import {
-    BarChart2,
     BarChart3,
     Briefcase,
     Calendar,
