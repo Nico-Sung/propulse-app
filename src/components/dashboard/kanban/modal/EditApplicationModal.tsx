@@ -64,7 +64,7 @@ export function EditApplicationSheet({
                                 variant="ghost"
                                 className={`flex items-center gap-2 px-4 py-2 font-medium rounded-none border-b-2 transition-none hover:bg-transparent hover:text-current focus:bg-transparent ${
                                     activeTab === tab.id
-                                        ? "border-teal-600 text-teal-600"
+                                        ? "border-primary text-primary"
                                         : "border-transparent text-slate-600"
                                 }`}
                                 onClick={() => setActiveTab(tab.id)}

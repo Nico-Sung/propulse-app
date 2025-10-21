@@ -71,7 +71,7 @@ function ShellLayout({ children }: { children: React.ReactNode }) {
     };
 
     return (
-        <div className="h-screen flex flex-col bg-slate-50">
+        <div className=" flex flex-col bg-slate-50">
             <header className="bg-white border-b border-slate-200 px-6 py-3">
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
@@ -125,9 +125,9 @@ function ShellLayout({ children }: { children: React.ReactNode }) {
                 </div>
             </header>
 
-            <nav className="bg-none border-b border-slate-200 px-6 ">
+            <nav className="bg-none border-b border-slate-200 px-6">
                 <Tabs value={tab} onValueChange={handleNavigate}>
-                    <TabsList className="bg-none-important">
+                    <TabsList className="bg-none-important no-scrollbar">
                         <TabsTrigger value="dashboard">
                             <LayoutDashboard /> Pipeline
                         </TabsTrigger>

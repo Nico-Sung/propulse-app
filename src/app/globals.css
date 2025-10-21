@@ -25,6 +25,7 @@
     --color-input: var(--input);
     --color-border: var(--border);
     --color-destructive: var(--destructive);
+    --color-warning: var(--warning);
     --color-accent-foreground: var(--accent-foreground);
     --color-accent: var(--accent);
     --color-muted-foreground: var(--muted-foreground);
@@ -59,6 +60,7 @@
     --muted-foreground: oklch(0.516 0.078 263.53177715199246);
     --accent: oklch(0.889 0.033 264.39213216871667);
     --accent-foreground: oklch(0.197 0.04 263.0723269757665);
+    --warning: oklch(75.342% 0.17134 55.43);
     --destructive: oklch(0.58 0.237 28.43022926835137);
     --border: oklch(0.882 0.018 264.4781721984889);
     --input: oklch(0.882 0.018 264.4781721984889);
@@ -93,6 +95,7 @@
     --muted-foreground: oklch(0.709 0.028 264.38041351996094);
     --accent: oklch(0.441 0.124 262.49320955578696);
     --accent-foreground: oklch(0.954 0.014 264.5022112962365);
+    --warning: oklch(0.694 0.201 76.429);
     --destructive: oklch(0.58 0.237 28.43022926835137);
     --border: oklch(0.391 0.056 263.6036818867752);
     --input: oklch(0.391 0.056 263.6036818867752);
@@ -118,6 +121,16 @@
     }
     body {
         @apply bg-background text-foreground;
+    }
+}
+
+@layer utilities {
+    .no-scrollbar::-webkit-scrollbar {
+        display: none;
+    }
+    .no-scrollbar {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
     }
 }
 

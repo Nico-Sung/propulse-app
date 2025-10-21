@@ -2,18 +2,20 @@
 
 import React from "react";
 import KanbanView from "@/components/views/KanbanView";
-import DailyActions from "./DailyActions";
 import { useDashboardTab } from "@/contexts/DashboardTabContext";
+import DailyActionsView from "../views/DailyActionsView";
 
 export default function DashboardShell({
     initialApplications,
+    initialActions,
 }: {
     initialApplications?: any[];
+    initialActions?: any[];
 }) {
     const { tab } = useDashboardTab();
 
     return (
-        <div className="min-h-screen">
+        <div className="">
             <main className="p-6 min-h-screen">
                 {tab === "dashboard" && (
                     <div className="w-full min-h-screen">
@@ -23,10 +25,7 @@ export default function DashboardShell({
 
                 {tab === "actions" && (
                     <div>
-                        <h2 className="text-lg font-semibold">
-                            Actions du jour
-                        </h2>
-                        <DailyActions />
+                        <DailyActionsView initialActions={initialActions} />
                     </div>
                 )}
 
