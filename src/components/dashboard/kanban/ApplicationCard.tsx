@@ -13,7 +13,7 @@ import { Trash2 } from "lucide-react";
 import { Database } from "@/lib/database.types";
 import { supabase } from "@/lib/supabaseClient";
 import ConfirmationDialog from "@/components/design-system/confirm-dialog";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 type Application = Database["public"]["Tables"]["applications"]["Row"];
 

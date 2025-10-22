@@ -17,6 +17,7 @@ import {
     Loader2,
     X,
 } from "lucide-react";
+import ConfirmationDialog from "@/components/design-system/confirm-dialog";
 
 type Contact = Database["public"]["Tables"]["contacts"]["Row"];
 
@@ -38,6 +39,12 @@ export function ContactsTab({ applicationId }: ContactSectionProps) {
     const [editingId, setEditingId] = useState<string | null>(null);
     const [formData, setFormData] = useState(initialFormState);
     const [loading, setLoading] = useState(false);
+    const [showDialog, setShowDialog] = useState(false);
+
+    const openDialog = (e?: React.MouseEvent) => {
+        e?.stopPropagation();
+        setShowDialog(true);
+    };
 
     useEffect(() => {
         if (applicationId) loadContacts();
@@ -70,13 +77,17 @@ export function ContactsTab({ applicationId }: ContactSectionProps) {
         setIsFormVisible(true);
     };
 
-    const handleDelete = async (contactId: string) => {
-        if (!confirm("Supprimer ce contact ?")) return;
+    const handleDelete = async (contactId: string): Promise<boolean> => {
         const { error } = await (supabase as any)
             .from("contacts")
             .delete()
             .eq("id", contactId);
-        if (!error) await loadContacts();
+        if (error) {
+            console.error("Erreur lors de la suppression du contact :", error);
+            return false;
+        }
+        await loadContacts();
+        return true;
     };
 
     const handleSave = async () => {
@@ -93,13 +104,11 @@ export function ContactsTab({ applicationId }: ContactSectionProps) {
                 .from("contacts")
                 .insert({ application_id: applicationId, ...formData });
             if (!error) {
-                await (supabase as any)
-                    .from("activity_history")
-                    .insert({
-                        application_id: applicationId,
-                        activity_type: "contact_added",
-                        description: `Contact ajouté : ${formData.name}`,
-                    });
+                await (supabase as any).from("activity_history").insert({
+                    application_id: applicationId,
+                    activity_type: "contact_added",
+                    description: `Contact ajouté : ${formData.name}`,
+                });
             }
         }
         await loadContacts();
@@ -230,7 +239,7 @@ export function ContactsTab({ applicationId }: ContactSectionProps) {
                                     variant="ghost"
                                     size="icon"
                                     className="h-7 w-7"
-                                    onClick={() => handleDelete(contact.id)}
+                                    onClick={(e) => openDialog(e)}
                                 >
                                     <Trash2 className="h-4 w-4 hover:text-destructive" />
                                 </Button>
@@ -272,6 +281,18 @@ export function ContactsTab({ applicationId }: ContactSectionProps) {
                                 </p>
                             )}
                         </CardContent>
+                        <ConfirmationDialog
+                            title="Confirmer la suppression"
+                            description="Êtes-vous sûr de vouloir supprimer cette candidature ? Cette action est irréversible."
+                            confirmLabel="Supprimer"
+                            cancelLabel="Annuler"
+                            open={showDialog}
+                            onOpenChange={setShowDialog}
+                            onConfirm={async () => {
+                                const ok = await handleDelete(contact.id);
+                                if (ok) setShowDialog(false);
+                            }}
+                        />
                     </Card>
                 ))}
             </div>

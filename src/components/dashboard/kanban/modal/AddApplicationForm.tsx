@@ -163,7 +163,7 @@ export default function AddApplicationForm({
 
             toast.success("Candidature créée avec succès !");
             setOpen(false);
-            router.refresh();
+            window.location.reload();
             form.reset();
         } catch (err: any) {
             console.error(err);
