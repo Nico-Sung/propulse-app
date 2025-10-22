@@ -12,6 +12,8 @@ import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
 import { Database } from "@/lib/database.types";
 import { supabase } from "@/lib/supabaseClient";
+import ConfirmationDialog from "@/components/design-system/confirm-dialog";
+import { useEffect, useState } from "react";
 
 type Application = Database["public"]["Tables"]["applications"]["Row"];
 
@@ -25,16 +27,23 @@ export function ApplicationCard({
     const { attributes, listeners, setNodeRef, transform, transition } =
         useSortable({ id: application.id });
     const style = { transform: CSS.Transform.toString(transform), transition };
+    const [showDialog, setShowDialog] = useState(false);
+
+    const openDialog = (e?: React.MouseEvent) => {
+        e?.stopPropagation();
+        setShowDialog(true);
+    };
 
     const handleDelete = async (applicationId: string) => {
-        if (!confirm("Supprimer cette candidature ?")) return;
         const { error } = await (supabase as any)
             .from("applications")
             .delete()
             .eq("id", applicationId);
-        if (!error) {
-            throw new Error("Not implemented: refresh the application list");
+        if (error) {
+            console.error("Erreur suppression application:", error);
+            return false;
         }
+        return window.location.reload();
     };
 
     return (
@@ -54,11 +63,24 @@ export function ApplicationCard({
                         variant="ghost"
                         size="icon"
                         className="absolute top-2 right-2 h-7 w-7 opacity-0 group-hover:opacity-100"
+                        onClick={(e) => openDialog(e)}
                     >
                         <Trash2 className="h-4 w-4 text-muted-foreground hover:text-destructive" />
                     </Button>
                 </CardHeader>
             </Card>
+            <ConfirmationDialog
+                title="Confirmer la suppression"
+                description="Êtes-vous sûr de vouloir supprimer cette candidature ? Cette action est irréversible."
+                confirmLabel="Supprimer"
+                cancelLabel="Annuler"
+                open={showDialog}
+                onOpenChange={setShowDialog}
+                onConfirm={async () => {
+                    const ok = await handleDelete(application.id);
+                    if (ok) setShowDialog(false);
+                }}
+            />
         </div>
     );
 }
