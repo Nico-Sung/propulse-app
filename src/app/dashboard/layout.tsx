@@ -26,6 +26,7 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import Spinner from "@/components/ui/Spinner";
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
     const { user, signOut, loading } = useAuth();
@@ -40,7 +41,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     if (loading || !user) {
         return (
             <div className="min-h-screen flex items-center justify-center">
-                {/* ajouter Spinner de chargement */}
+                <Spinner size={48} />
             </div>
         );
     }

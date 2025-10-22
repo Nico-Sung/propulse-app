@@ -6,6 +6,7 @@ import { supabase } from "@/lib/supabaseClient";
 import { useAuth } from "@/contexts/AuthContext";
 import type { Database } from "@/lib/database.types";
 import { CheckCircle2 } from "lucide-react";
+import Spinner from "@/components/ui/Spinner";
 import { DailyActionsHeader } from "./DailyActionsHeader";
 import { DailyActionsList } from "./DailyActionsList";
 
@@ -174,10 +175,7 @@ export default function DailyActions({
             <CardContent>
                 {loading ? (
                     <div className="flex items-center justify-center h-28">
-                        <div
-                            className="animate-spin rounded-full h-8 w-8 border-b-2"
-                            style={{ borderColor: "var(--color-primary)" }}
-                        />
+                        <Spinner size={32} />
                     </div>
                 ) : actions.length === 0 ? (
                     <div className="text-center py-6 bg-surface rounded-lg border-default">

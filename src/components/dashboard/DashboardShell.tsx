@@ -5,6 +5,7 @@ import KanbanView from "@/components/views/KanbanView";
 import { useDashboardTab } from "@/contexts/DashboardTabContext";
 import DailyActionsView from "../views/DailyActionsView";
 import CalendarView from "../views/CalendarView";
+import AnalyticsView from "../views/AnalyticsView";
 
 export default function DashboardShell({
     initialApplications,
@@ -38,7 +39,7 @@ export default function DashboardShell({
 
                 {tab === "analytics" && (
                     <div>
-                        <h2>Analyse (placeholder)</h2>
+                        <AnalyticsView />
                     </div>
                 )}
             </main>

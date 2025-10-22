@@ -24,6 +24,7 @@ import {
     arrayMove,
 } from "@dnd-kit/sortable";
 import { KanbanColumn } from "./KanbanColumn";
+import Spinner from "@/components/ui/Spinner";
 import { OverlayCard } from "@/components/design-system/overlay-card";
 
 type Application = Database["public"]["Tables"]["applications"]["Row"];
@@ -148,7 +149,7 @@ export default function KanbanBoard({
     if (loading) {
         return (
             <div className="flex items-center justify-center h-screen">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-500"></div>
+                <Spinner size={48} />
             </div>
         );
     }
