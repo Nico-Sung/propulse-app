@@ -188,7 +188,7 @@ export default function DailyActions({
                         <h3 className="text-lg font-semibold text-foreground mb-1">
                             Tout est à jour !
                         </h3>
-                        <p className="text-muted">
+                        <p className="text-muted-foreground">
                             Aucune action urgente pour aujourd'hui
                         </p>
                     </div>

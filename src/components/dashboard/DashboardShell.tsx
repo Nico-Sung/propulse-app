@@ -4,6 +4,7 @@ import React from "react";
 import KanbanView from "@/components/views/KanbanView";
 import { useDashboardTab } from "@/contexts/DashboardTabContext";
 import DailyActionsView from "../views/DailyActionsView";
+import CalendarView from "../views/CalendarView";
 
 export default function DashboardShell({
     initialApplications,
@@ -31,7 +32,7 @@ export default function DashboardShell({
 
                 {tab === "calendar" && (
                     <div>
-                        <h2>Calendrier (placeholder)</h2>
+                        <CalendarView />
                     </div>
                 )}
 

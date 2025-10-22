@@ -4,7 +4,10 @@ import { Database } from "@/lib/database.types";
 import DashboardShell from "@/components/dashboard/DashboardShell";
 
 async function getApplications() {
-    const supabase = createServerComponentClient<Database>({ cookies });
+    const cookieStore = await cookies();
+    const supabase = createServerComponentClient<Database>({
+        cookies: ((): any => cookieStore) as any,
+    });
     const {
         data: { session },
     } = await supabase.auth.getSession();

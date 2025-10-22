@@ -4,7 +4,6 @@ import { createContext, useContext, useEffect, useState } from "react";
 import { User } from "@supabase/supabase-js";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
-import type { Database } from "@/lib/database.types";
 
 interface AuthContextType {
     user: User | null;
