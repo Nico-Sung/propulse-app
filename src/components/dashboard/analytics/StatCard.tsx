@@ -30,7 +30,7 @@ export default function StatCard({ icon: Icon, title, value, color }: Props) {
                 </div>
             </CardHeader>
             <CardContent>
-                <div className="text-3xl font-bold text-foreground">
+                <div className="text-2xl font-bold text-foreground">
                     {value}
                 </div>
                 <p className="text-sm text-muted-foreground mt-1">{title}</p>

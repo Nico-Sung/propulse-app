@@ -1,7 +1,13 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import {
+    Card,
+    CardHeader,
+    CardTitle,
+    CardContent,
+    CardDescription,
+} from "@/components/ui/card";
 import { supabase } from "@/lib/supabaseClient";
 import { useAuth } from "@/contexts/AuthContext";
 import type { Database } from "@/lib/database.types";
@@ -170,7 +176,12 @@ export default function DailyActions({
     return (
         <Card>
             <CardHeader>
-                <CardTitle>Actions du jour</CardTitle>
+                <CardTitle className="text-2xl font-bold text-foreground ">
+                    Actions du jour
+                </CardTitle>
+                <CardDescription className="text-base text-muted-foreground">
+                    Concentrez-vous sur l'essentiel
+                </CardDescription>
             </CardHeader>
             <CardContent>
                 {loading ? (
