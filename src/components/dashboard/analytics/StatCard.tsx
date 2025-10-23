@@ -14,7 +14,7 @@ export default function StatCard({ icon: Icon, title, value, color }: Props) {
     const mapping: Record<string, string> = {
         primary: "bg-primary/10 text-primary",
         "primary-variant": "bg-primary/20 text-primary",
-        warning: "bg-amber-100 text-amber-600",
+        warning: "bg-warning/10 text-warning",
         success: "bg-success/10 text-success",
     };
 

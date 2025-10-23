@@ -23,20 +23,20 @@ interface ActivityHistorySectionProps {
 }
 
 const activityConfig: Record<string, { Icon: any; className: string }> = {
-    status_change: { Icon: Clock, className: "bg-blue-100 text-blue-600" },
-    note: { Icon: FileText, className: "bg-slate-100 text-slate-600" },
+    status_change: { Icon: Clock, className: "bg-primary/10 text-primary" },
+    note: { Icon: FileText, className: "bg-surface text-muted-foreground" },
     task_completed: {
         Icon: CheckSquare,
-        className: "bg-teal-100 text-teal-600",
+        className: "bg-primary/10 text-primary",
     },
     document_added: {
         Icon: Upload,
-        className: "bg-purple-100 text-purple-600",
+        className: "bg-accent/10 text-accent",
     },
-    contact_added: { Icon: UserPlus, className: "bg-amber-100 text-amber-600" },
+    contact_added: { Icon: UserPlus, className: "bg-warning/10 text-warning" },
     interview_scheduled: {
         Icon: Calendar,
-        className: "bg-green-100 text-green-600",
+        className: "bg-success/10 text-success",
     },
 };
 
@@ -101,12 +101,12 @@ export function HistoryTab({ applicationId }: ActivityHistorySectionProps) {
 
             <div className="space-y-4">
                 {loading && (
-                    <p className="text-center text-slate-500">
+                    <p className="text-center text-muted-foreground">
                         Chargement de l'historique...
                     </p>
                 )}
                 {!loading && activities.length === 0 && (
-                    <p className="text-center text-slate-500 py-8">
+                    <p className="text-center text-muted-foreground py-8">
                         Aucun historique pour le moment.
                     </p>
                 )}
@@ -131,11 +131,11 @@ export function HistoryTab({ applicationId }: ActivityHistorySectionProps) {
                                         <Icon className="w-4 h-4" />
                                     </AvatarFallback>
                                 </Avatar>
-                                <div className="flex-1 bg-slate-50 rounded-lg p-3 border">
-                                    <p className="text-sm text-slate-900">
+                                <div className="flex-1 bg-surface rounded-lg p-3 border border-default">
+                                    <p className="text-sm text-foreground">
                                         {activity.description}
                                     </p>
-                                    <p className="text-xs text-slate-500 mt-1">
+                                    <p className="text-xs text-muted-foreground mt-1">
                                         {new Date(
                                             activity.created_at
                                         ).toLocaleString("fr-FR", {

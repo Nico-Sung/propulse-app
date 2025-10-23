@@ -5,7 +5,7 @@ import Footer from "@/components/landing-page/Footer";
 
 export default function LandingPage() {
     return (
-        <div className="bg-white text-gray-800">
+        <div className="bg-surface text-foreground">
             <HeroSection />
             <FeaturesSection />
             <FinalCTASection />

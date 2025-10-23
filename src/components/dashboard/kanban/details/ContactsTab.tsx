@@ -216,7 +216,7 @@ export function ContactsTab({ applicationId }: ContactSectionProps) {
 
             <div className="space-y-3">
                 {contacts.length === 0 && !isFormVisible && (
-                    <p className="text-center text-slate-500 py-8">
+                    <p className="text-center text-muted-foreground py-8">
                         Aucun contact enregistré.
                     </p>
                 )}
@@ -249,7 +249,7 @@ export function ContactsTab({ applicationId }: ContactSectionProps) {
                             {contact.email && (
                                 <a
                                     href={`mailto:${contact.email}`}
-                                    className="flex items-center gap-2 text-slate-600 hover:text-primary"
+                                    className="flex items-center gap-2 text-muted-foreground hover:text-primary"
                                 >
                                     <Mail className="w-4 h-4" />
                                     {contact.email}
@@ -258,7 +258,7 @@ export function ContactsTab({ applicationId }: ContactSectionProps) {
                             {contact.phone && (
                                 <a
                                     href={`tel:${contact.phone}`}
-                                    className="flex items-center gap-2 text-slate-600 hover:text-primary"
+                                    className="flex items-center gap-2 text-muted-foreground hover:text-primary"
                                 >
                                     <Phone className="w-4 h-4" />
                                     {contact.phone}
@@ -269,14 +269,14 @@ export function ContactsTab({ applicationId }: ContactSectionProps) {
                                     href={contact.linkedin_url}
                                     target="_blank"
                                     rel="noreferrer"
-                                    className="flex items-center gap-2 text-slate-600 hover:text-primary"
+                                    className="flex items-center gap-2 text-muted-foreground hover:text-primary"
                                 >
                                     <Linkedin className="w-4 h-4" />
                                     Profil LinkedIn
                                 </a>
                             )}
                             {contact.notes && (
-                                <p className="text-slate-600 mt-2 pt-2 border-t">
+                                <p className="text-muted-foreground mt-2 pt-2 border-t border-default">
                                     {contact.notes}
                                 </p>
                             )}

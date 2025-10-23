@@ -27,7 +27,7 @@ export default function CalendarEventItem({ event }: { event: CalendarEvent }) {
                     ? "bg-primary/10 border-primary"
                     : past
                     ? "bg-surface border-default"
-                    : "bg-amber-50 border-amber-500"
+                    : "bg-warning/10 border-warning"
             }`}
         >
             <div className="flex items-start justify-between">
@@ -36,13 +36,13 @@ export default function CalendarEventItem({ event }: { event: CalendarEvent }) {
                         {event.type === "interview" ? (
                             <Clock className="w-4 h-4 text-primary" />
                         ) : (
-                            <CalendarIcon className="w-4 h-4 text-amber-600" />
+                            <CalendarIcon className="w-4 h-4 text-warning" />
                         )}
                         <span
                             className={`text-xs font-semibold uppercase tracking-wide ${
                                 event.type === "interview"
                                     ? "text-primary"
-                                    : "text-amber-700"
+                                    : "text-warning"
                             }`}
                         >
                             {event.type === "interview"
