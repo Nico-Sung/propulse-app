@@ -27,6 +27,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Spinner from "@/components/ui/Spinner";
+import ThemeToggle from "@/components/design-system/theme-toggle";
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
     const { user, signOut, loading } = useAuth();
@@ -87,6 +88,7 @@ function ShellLayout({ children }: { children: React.ReactNode }) {
                             </p>
                         </div>
                     </div>
+                    <ThemeToggle />
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                             <Button
