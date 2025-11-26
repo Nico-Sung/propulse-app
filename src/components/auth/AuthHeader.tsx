@@ -1,7 +1,7 @@
 "use client";
 
-import { Briefcase } from "lucide-react";
 import { CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Briefcase } from "lucide-react";
 
 export default function AuthHeader() {
     return (
