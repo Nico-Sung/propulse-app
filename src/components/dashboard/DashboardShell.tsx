@@ -6,6 +6,7 @@ import { useDashboardTab } from "@/contexts/DashboardTabContext";
 import DailyActionsView from "../views/DailyActionsView";
 import CalendarView from "../views/CalendarView";
 import AnalyticsView from "../views/AnalyticsView";
+import DocumentsView from "../views/DocumentView";
 
 export default function DashboardShell({
     initialApplications,
@@ -18,27 +19,33 @@ export default function DashboardShell({
 
     return (
         <div className="">
-            <main className="p-6 min-h-screen">
+            <main className="min-h-screen">
                 {tab === "dashboard" && (
-                    <div className="w-full min-h-screen">
+                    <div className="w-full min-h-screen p-6">
                         <KanbanView initialApplications={initialApplications} />
                     </div>
                 )}
 
                 {tab === "actions" && (
-                    <div>
+                    <div className="p-6">
                         <DailyActionsView initialActions={initialActions} />
                     </div>
                 )}
 
                 {tab === "calendar" && (
-                    <div>
+                    <div className="p-6">
                         <CalendarView />
                     </div>
                 )}
 
+                {tab === "documents" && (
+                    <div className="w-full">
+                        <DocumentsView />
+                    </div>
+                )}
+
                 {tab === "analytics" && (
-                    <div>
+                    <div className="p-6">
                         <AnalyticsView />
                     </div>
                 )}

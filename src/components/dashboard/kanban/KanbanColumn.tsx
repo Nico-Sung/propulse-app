@@ -1,52 +1,375 @@
+"use client";
+
 import { UniqueIdentifier, useDroppable } from "@dnd-kit/core";
+import { cn } from "@/lib/utils";
+import {
+    ContextMenu,
+    ContextMenuContent,
+    ContextMenuItem,
+    ContextMenuTrigger,
+    ContextMenuLabel,
+    ContextMenuSeparator,
+    ContextMenuSub,
+    ContextMenuSubTrigger,
+    ContextMenuSubContent,
+    ContextMenuCheckboxItem,
+} from "@/components/ui/context-menu";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuSub,
+    DropdownMenuSubTrigger,
+    DropdownMenuSubContent,
+    DropdownMenuCheckboxItem,
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
+import {
+    PlusCircle,
+    RotateCw,
+    SortAsc,
+    Trash2,
+    Palette,
+    MoreHorizontal,
+} from "lucide-react";
+import { toast } from "sonner";
+import { useMemo } from "react";
+import { Database } from "@/lib/database.types";
+import { ApplicationCard } from "./ApplicationCard";
+import { SortableContext, rectSortingStrategy } from "@dnd-kit/sortable";
 
-interface Props {
-    column: (typeof COLUMNS)[number];
-    items?: UniqueIdentifier[];
-    children: React.ReactNode;
+type Application = Database["public"]["Tables"]["applications"]["Row"];
+
+export type SortOption = "date_desc" | "date_asc" | "name_asc";
+export type ViewMode = "normal" | "compact";
+
+interface KanbanColumnProps {
+    column: { id: string; label: string; color: string };
+    applications: Application[];
+    onCardClick: (app: Application) => void;
+    sortOption: SortOption;
+    onSortChange: (option: SortOption) => void;
+    viewMode: ViewMode;
+    onViewModeChange: (mode: ViewMode) => void;
+    onAddApplication: () => void;
 }
-
-const COLUMNS = [
-    { id: "to_apply", label: "À postuler", color: "bg-primary/10" },
-    { id: "applied", label: "Candidature envoyée", color: "bg-primary/10" },
-    { id: "waiting", label: "En attente", color: "bg-warning/10" },
-    { id: "interview", label: "Processus d'entretien", color: "bg-primary/10" },
-    { id: "offer", label: "Offre reçue", color: "bg-success/10" },
-    { id: "rejected", label: "Refusée", color: "bg-destructive/10" },
-] as const;
 
 export function KanbanColumn({
     column,
-    items,
-    children,
-}: {
-    column: (typeof COLUMNS)[number];
-    items?: UniqueIdentifier[];
-    children: React.ReactNode;
-}) {
+    applications,
+    onCardClick,
+    sortOption,
+    onSortChange,
+    viewMode,
+    onViewModeChange,
+    onAddApplication,
+}: KanbanColumnProps) {
     const { setNodeRef, isOver } = useDroppable({ id: column.id });
+
+    const sortedApplications = useMemo(() => {
+        const apps = [...applications];
+        switch (sortOption) {
+            case "date_desc":
+                return apps.sort(
+                    (a, b) =>
+                        new Date(b.created_at).getTime() -
+                        new Date(a.created_at).getTime()
+                );
+            case "date_asc":
+                return apps.sort(
+                    (a, b) =>
+                        new Date(a.created_at).getTime() -
+                        new Date(b.created_at).getTime()
+                );
+            case "name_asc":
+                return apps.sort((a, b) =>
+                    a.company_name.localeCompare(b.company_name)
+                );
+            default:
+                return apps;
+        }
+    }, [applications, sortOption]);
+
+    const sortedIds = useMemo(
+        () => sortedApplications.map((app) => app.id),
+        [sortedApplications]
+    );
+
+    const badgeColorMap: Record<string, string> = {
+        to_apply:
+            "bg-slate-200/50 text-slate-700 dark:bg-slate-800/50 dark:text-slate-300",
+        applied:
+            "bg-blue-200/50 text-blue-700 dark:bg-blue-900/50 dark:text-blue-300",
+        waiting:
+            "bg-orange-200/50 text-orange-700 dark:bg-orange-900/50 dark:text-orange-300",
+        interview:
+            "bg-purple-200/50 text-purple-700 dark:bg-purple-900/50 dark:text-purple-300",
+        offer: "bg-emerald-200/50 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300",
+        rejected:
+            "bg-red-200/50 text-red-700 dark:bg-red-900/50 dark:text-red-300",
+    };
+
+    const columnBgMap: Record<string, string> = {
+        to_apply:
+            "bg-slate-50/40 dark:bg-slate-900/20 border-slate-100/50 dark:border-slate-800/50",
+        applied:
+            "bg-blue-50/30 dark:bg-blue-900/10 border-blue-100/30 dark:border-blue-900/20",
+        waiting:
+            "bg-orange-50/30 dark:bg-orange-900/10 border-orange-100/30 dark:border-orange-900/20",
+        interview:
+            "bg-purple-50/30 dark:bg-purple-900/10 border-purple-100/30 dark:border-purple-900/20",
+        offer: "bg-emerald-50/30 dark:bg-emerald-900/10 border-emerald-100/30 dark:border-emerald-900/20",
+        rejected:
+            "bg-red-50/30 dark:bg-red-900/10 border-red-100/30 dark:border-red-900/20",
+    };
+
     return (
-        <div ref={setNodeRef} className=" w-80 flex flex-col  min-h-screen ">
-            <div className="bg-surface rounded-lg shadow-sm border border-default p-4 mb-3 ">
-                <div className="flex items-center justify-between">
-                    <h3 className="font-semibold text-foreground">
+        <div className="flex flex-col w-80 h-full shrink-0">
+            <div className="flex items-center justify-between px-3 mb-3">
+                <div className="flex items-center gap-2">
+                    <h3 className="font-bold text-sm text-foreground/80 tracking-tight">
                         {column.label}
                     </h3>
-                    <span className="bg-muted text-foreground text-xs font-semibold px-2 py-1 rounded-full">
-                        {items?.length || 0}
+                    <span
+                        className={cn(
+                            "text-[10px] font-bold px-2 py-0.5 rounded-full backdrop-blur-sm",
+                            badgeColorMap[column.id] ||
+                                "bg-muted text-muted-foreground"
+                        )}
+                    >
+                        {applications.length}
                     </span>
                 </div>
+
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-6 w-6 text-muted-foreground hover:text-foreground"
+                        >
+                            <MoreHorizontal className="h-4 w-4" />
+                        </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent
+                        align="end"
+                        className="w-56 bg-white/95 dark:bg-zinc-900/95 backdrop-blur-xl border border-white/20 shadow-xl p-1"
+                    >
+                        <DropdownMenuLabel className="text-xs text-muted-foreground uppercase font-bold px-2 py-1.5">
+                            Options de colonne
+                        </DropdownMenuLabel>
+
+                        <DropdownMenuItem
+                            onClick={onAddApplication}
+                            className="rounded-md focus:bg-primary/10 focus:text-primary"
+                        >
+                            <PlusCircle className="mr-2 h-4 w-4" />
+                            Ajouter une carte
+                        </DropdownMenuItem>
+
+                        <DropdownMenuSub>
+                            <DropdownMenuSubTrigger className="rounded-md focus:bg-primary/10 focus:text-primary">
+                                <SortAsc className="mr-2 h-4 w-4" />
+                                Trier par...
+                            </DropdownMenuSubTrigger>
+                            <DropdownMenuSubContent className="bg-white/95 dark:bg-zinc-900/95 backdrop-blur-xl border border-white/20 shadow-xl p-1">
+                                <DropdownMenuCheckboxItem
+                                    checked={sortOption === "date_desc"}
+                                    onCheckedChange={() =>
+                                        onSortChange("date_desc")
+                                    }
+                                    className="rounded-md focus:bg-primary/10 focus:text-primary"
+                                >
+                                    Date d'ajout (Récent)
+                                </DropdownMenuCheckboxItem>
+                                <DropdownMenuCheckboxItem
+                                    checked={sortOption === "date_asc"}
+                                    onCheckedChange={() =>
+                                        onSortChange("date_asc")
+                                    }
+                                    className="rounded-md focus:bg-primary/10 focus:text-primary"
+                                >
+                                    Date d'ajout (Ancien)
+                                </DropdownMenuCheckboxItem>
+                                <DropdownMenuCheckboxItem
+                                    checked={sortOption === "name_asc"}
+                                    onCheckedChange={() =>
+                                        onSortChange("name_asc")
+                                    }
+                                    className="rounded-md focus:bg-primary/10 focus:text-primary"
+                                >
+                                    Nom (A-Z)
+                                </DropdownMenuCheckboxItem>
+                            </DropdownMenuSubContent>
+                        </DropdownMenuSub>
+
+                        <DropdownMenuSeparator className="bg-border/50" />
+
+                        <DropdownMenuSub>
+                            <DropdownMenuSubTrigger className="rounded-md focus:bg-primary/10 focus:text-primary">
+                                <Palette className="mr-2 h-4 w-4" />
+                                Apparence
+                            </DropdownMenuSubTrigger>
+                            <DropdownMenuSubContent className="bg-white/95 dark:bg-zinc-900/95 backdrop-blur-xl border border-white/20 shadow-xl p-1">
+                                <DropdownMenuCheckboxItem
+                                    checked={viewMode === "normal"}
+                                    onCheckedChange={() =>
+                                        onViewModeChange("normal")
+                                    }
+                                    className="rounded-md focus:bg-primary/10 focus:text-primary"
+                                >
+                                    Mode Normal
+                                </DropdownMenuCheckboxItem>
+                                <DropdownMenuCheckboxItem
+                                    checked={viewMode === "compact"}
+                                    onCheckedChange={() =>
+                                        onViewModeChange("compact")
+                                    }
+                                    className="rounded-md focus:bg-primary/10 focus:text-primary"
+                                >
+                                    Mode Compact
+                                </DropdownMenuCheckboxItem>
+                            </DropdownMenuSubContent>
+                        </DropdownMenuSub>
+
+                        <DropdownMenuItem
+                            onClick={() => window.location.reload()}
+                            className="rounded-md focus:bg-primary/10 focus:text-primary"
+                        >
+                            <RotateCw className="mr-2 h-4 w-4" />
+                            Rafraîchir
+                        </DropdownMenuItem>
+                    </DropdownMenuContent>
+                </DropdownMenu>
             </div>
 
-            <div
-                className={`flex-1 ${
-                    column.color
-                } rounded-lg p-3 space-y-3  min-h-screen  ${
-                    isOver ? "ring-2 ring-teal-300" : ""
-                }`}
-            >
-                {children}
-            </div>
+            <ContextMenu>
+                <ContextMenuTrigger className="flex-1 h-full">
+                    <div
+                        ref={setNodeRef}
+                        className={cn(
+                            "flex-1 rounded-2xl transition-all duration-300 p-2 space-y-3 border h-full min-h-[500px] backdrop-blur-[2px]",
+                            columnBgMap[column.id] ||
+                                "bg-muted/20 border-transparent",
+                            isOver
+                                ? "ring-2 ring-primary/20 bg-background/60"
+                                : ""
+                        )}
+                    >
+                        <SortableContext
+                            items={sortedIds}
+                            strategy={rectSortingStrategy}
+                        >
+                            {sortedApplications.map((app) => (
+                                <ApplicationCard
+                                    key={app.id}
+                                    application={app}
+                                    onCardClick={() => onCardClick(app)}
+                                    compact={viewMode === "compact"}
+                                />
+                            ))}
+                        </SortableContext>
+                    </div>
+                </ContextMenuTrigger>
+
+                <ContextMenuContent className="w-56 bg-white/95 dark:bg-zinc-900/95 backdrop-blur-xl border border-white/20 shadow-xl p-1">
+                    <ContextMenuLabel className="text-xs text-muted-foreground uppercase font-bold px-2 py-1.5">
+                        Actions de colonne
+                    </ContextMenuLabel>
+
+                    <ContextMenuItem
+                        onClick={onAddApplication}
+                        className="rounded-md focus:bg-primary/10 focus:text-primary"
+                    >
+                        <PlusCircle className="mr-2 h-4 w-4" />
+                        Ajouter une carte
+                    </ContextMenuItem>
+
+                    <ContextMenuMenuItemGroup
+                        sortOption={sortOption}
+                        onSortChange={onSortChange}
+                        viewMode={viewMode}
+                        onViewModeChange={onViewModeChange}
+                    />
+
+                    <ContextMenuItem
+                        onClick={() => window.location.reload()}
+                        className="rounded-md focus:bg-primary/10 focus:text-primary"
+                    >
+                        <RotateCw className="mr-2 h-4 w-4" />
+                        Rafraîchir la liste
+                    </ContextMenuItem>
+                </ContextMenuContent>
+            </ContextMenu>
         </div>
+    );
+}
+
+function ContextMenuMenuItemGroup({
+    sortOption,
+    onSortChange,
+    viewMode,
+    onViewModeChange,
+}: any) {
+    return (
+        <>
+            <ContextMenuSub>
+                <ContextMenuSubTrigger className="rounded-md focus:bg-primary/10 focus:text-primary">
+                    <SortAsc className="mr-2 h-4 w-4" />
+                    Trier par...
+                </ContextMenuSubTrigger>
+                <ContextMenuSubContent className="bg-white/95 dark:bg-zinc-900/95 backdrop-blur-xl border border-white/20 shadow-xl p-1">
+                    <ContextMenuCheckboxItem
+                        checked={sortOption === "date_desc"}
+                        onCheckedChange={() => onSortChange("date_desc")}
+                        className="rounded-md focus:bg-primary/10 focus:text-primary"
+                    >
+                        Date d'ajout (Récent)
+                    </ContextMenuCheckboxItem>
+                    <ContextMenuCheckboxItem
+                        checked={sortOption === "date_asc"}
+                        onCheckedChange={() => onSortChange("date_asc")}
+                        className="rounded-md focus:bg-primary/10 focus:text-primary"
+                    >
+                        Date d'ajout (Ancien)
+                    </ContextMenuCheckboxItem>
+                    <ContextMenuCheckboxItem
+                        checked={sortOption === "name_asc"}
+                        onCheckedChange={() => onSortChange("name_asc")}
+                        className="rounded-md focus:bg-primary/10 focus:text-primary"
+                    >
+                        Nom (A-Z)
+                    </ContextMenuCheckboxItem>
+                </ContextMenuSubContent>
+            </ContextMenuSub>
+
+            <ContextMenuSeparator className="bg-border/50" />
+
+            <ContextMenuSub>
+                <ContextMenuSubTrigger className="rounded-md focus:bg-primary/10 focus:text-primary">
+                    <Palette className="mr-2 h-4 w-4" />
+                    Apparence
+                </ContextMenuSubTrigger>
+                <ContextMenuSubContent className="bg-white/95 dark:bg-zinc-900/95 backdrop-blur-xl border border-white/20 shadow-xl p-1">
+                    <ContextMenuCheckboxItem
+                        checked={viewMode === "normal"}
+                        onCheckedChange={() => onViewModeChange("normal")}
+                        className="rounded-md focus:bg-primary/10 focus:text-primary"
+                    >
+                        Mode Normal
+                    </ContextMenuCheckboxItem>
+                    <ContextMenuCheckboxItem
+                        checked={viewMode === "compact"}
+                        onCheckedChange={() => onViewModeChange("compact")}
+                        className="rounded-md focus:bg-primary/10 focus:text-primary"
+                    >
+                        Mode Compact
+                    </ContextMenuCheckboxItem>
+                </ContextMenuSubContent>
+            </ContextMenuSub>
+        </>
     );
 }

@@ -2,11 +2,12 @@
 
 import { useState } from "react";
 import { Database } from "@/lib/database.types";
-import { FileText, CheckSquare, Clock, User } from "lucide-react";
+import { FileText, CheckSquare, Clock, User, Paperclip } from "lucide-react";
 import { TasksTab } from "../details/TasksTab";
 import { HistoryTab } from "../details/HistoryTab";
 import { ContactsTab } from "../details/ContactsTab";
 import { InfoTab } from "../details/InfoTab";
+import { DocumentsTab } from "../details/DocumentsTab";
 import {
     Dialog,
     DialogContent,
@@ -26,7 +27,7 @@ interface Props {
     onUpdate: () => void;
 }
 
-type Tab = "info" | "tasks" | "history" | "contacts";
+type Tab = "info" | "tasks" | "history" | "contacts" | "documents";
 
 export function EditApplicationSheet({
     application,
@@ -39,33 +40,36 @@ export function EditApplicationSheet({
     const [activeTab, setActiveTab] = useState<Tab>("info");
 
     const tabs = [
-        { id: "info" as Tab, label: "Informations", icon: FileText },
+        { id: "info" as Tab, label: "Infos", icon: FileText },
         { id: "tasks" as Tab, label: "Tâches", icon: CheckSquare },
-        { id: "history" as Tab, label: "Historique", icon: Clock },
+        { id: "documents" as Tab, label: "Docs", icon: Paperclip },
         { id: "contacts" as Tab, label: "Contacts", icon: User },
+        { id: "history" as Tab, label: "Historique", icon: Clock },
     ];
 
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
-            <DialogContent className="w-full sm:max-w-3xl flex flex-col max-h-[90vh]">
-                <DialogHeader>
-                    <DialogTitle>{application.position_title}</DialogTitle>
+            <DialogContent className="w-full sm:max-w-4xl flex flex-col max-h-[90vh] h-[800px] p-0 gap-0 bg-background">
+                <DialogHeader className="px-6 py-4 border-b border-border flex-shrink-0">
+                    <DialogTitle className="text-xl">
+                        {application.position_title}
+                    </DialogTitle>
                     <DialogDescription className="text-muted-foreground text-sm">
                         {application.company_name}
                     </DialogDescription>
                 </DialogHeader>
 
-                <div className="flex gap-2 border-b border-default -mb-px px-6">
+                <div className="flex border-b border-border bg-muted/30 px-6 flex-shrink-0 overflow-x-auto no-scrollbar">
                     {tabs.map((tab) => {
                         const Icon = tab.icon;
                         return (
                             <Button
                                 key={tab.id}
                                 variant="ghost"
-                                className={`flex items-center gap-2 px-4 py-2 font-medium rounded-none border-b-2 transition-none hover:bg-transparent hover:text-current focus:bg-transparent ${
+                                className={`flex items-center gap-2 px-4 py-3 font-medium rounded-none border-b-2 transition-all h-auto focus:ring-0 ${
                                     activeTab === tab.id
-                                        ? "border-primary text-primary"
-                                        : "border-transparent text-muted-foreground"
+                                        ? "border-primary text-primary bg-primary/5"
+                                        : "border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/50"
                                 }`}
                                 onClick={() => setActiveTab(tab.id)}
                             >
@@ -76,7 +80,7 @@ export function EditApplicationSheet({
                     })}
                 </div>
 
-                <div className="flex-1 overflow-y-auto p-6">
+                <div className="flex-1 overflow-y-auto p-6 bg-background/50">
                     {activeTab === "info" && (
                         <InfoTab
                             application={application}
@@ -87,9 +91,15 @@ export function EditApplicationSheet({
                     {activeTab === "tasks" && (
                         <TasksTab applicationId={application.id} />
                     )}
+
+                    {activeTab === "documents" && (
+                        <DocumentsTab applicationId={application.id} />
+                    )}
+
                     {activeTab === "history" && (
                         <HistoryTab applicationId={application.id} />
                     )}
+
                     {activeTab === "contacts" && (
                         <ContactsTab applicationId={application.id} />
                     )}

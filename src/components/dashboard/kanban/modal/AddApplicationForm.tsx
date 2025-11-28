@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 import { useForm } from "react-hook-form";
@@ -25,7 +25,6 @@ import {
     FormMessage,
 } from "@/components/ui/form";
 import { toast } from "sonner";
-import { is } from "zod/v4/locales";
 
 const applicationSchema = z.object({
     id: z.string().optional(),
@@ -56,8 +55,10 @@ type ApplicationFormValues = z.infer<typeof applicationSchema>;
 
 export default function AddApplicationForm({
     setOpen,
+    defaultStatus = "to_apply",
 }: {
     setOpen: (open: boolean) => void;
+    defaultStatus?: string;
 }) {
     const router = useRouter();
 
@@ -68,9 +69,13 @@ export default function AddApplicationForm({
             positionTitle: "",
             jobUrl: "",
             contractType: "",
-            status: "to_apply",
+            status: defaultStatus as any,
         },
     });
+
+    useEffect(() => {
+        form.setValue("status", defaultStatus as any);
+    }, [defaultStatus, form]);
 
     async function onSubmit(values: ApplicationFormValues) {
         form.resetField("id");
@@ -102,7 +107,7 @@ export default function AddApplicationForm({
                 company_name: values.companyName,
                 position_title: values.positionTitle,
                 job_description: values.jobDescription ?? "",
-                status: (values.status as any) ?? "to_apply",
+                status: (values.status as any) ?? defaultStatus,
                 application_date: values.applicationDate ?? null,
                 last_contact_date: values.lastContactDate ?? null,
                 notes: values.notes ?? "",
@@ -386,7 +391,7 @@ export default function AddApplicationForm({
                                 <FormLabel>Statut</FormLabel>
                                 <Select
                                     onValueChange={field.onChange}
-                                    defaultValue={field.value ?? "to_apply"}
+                                    defaultValue={field.value ?? defaultStatus}
                                 >
                                     <FormControl>
                                         <SelectTrigger>

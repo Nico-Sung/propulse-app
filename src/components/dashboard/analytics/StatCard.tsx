@@ -19,10 +19,10 @@ export default function StatCard({ icon: Icon, title, value, color }: Props) {
     };
 
     return (
-        <Card>
+        <Card className="glass-card bg-transparent border-white/20 dark:border-white/10 hover:shadow-lg transition-all duration-300">
             <CardHeader className="pb-2">
                 <div
-                    className={`p-2 rounded-lg w-fit ${
+                    className={`p-2 rounded-xl w-fit backdrop-blur-sm ${
                         mapping[color] ?? "bg-surface text-foreground"
                     }`}
                 >
@@ -30,10 +30,12 @@ export default function StatCard({ icon: Icon, title, value, color }: Props) {
                 </div>
             </CardHeader>
             <CardContent>
-                <div className="text-2xl font-bold text-foreground">
+                <div className="text-2xl font-bold text-foreground tracking-tight">
                     {value}
                 </div>
-                <p className="text-sm text-muted-foreground mt-1">{title}</p>
+                <p className="text-sm text-muted-foreground mt-1 font-medium">
+                    {title}
+                </p>
             </CardContent>
         </Card>
     );

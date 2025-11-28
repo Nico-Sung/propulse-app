@@ -32,10 +32,9 @@
 }
 
 :root {
-    --radius: 0.75rem;
+    --radius: 1rem;
 
-    /* Fond très légèrement chaud (off-white) pour éviter le côté clinique */
-    --background: oklch(0.985 0.002 247.839);
+    --background: oklch(0.96 0.002 247.839);
     --foreground: oklch(0.14 0.02 255);
 
     --card: oklch(1 0 0);
@@ -44,26 +43,25 @@
     --popover: oklch(1 0 0);
     --popover-foreground: oklch(0.14 0.02 255);
 
-    /* Indigo/Violet "Electrique" moderne */
-    --primary: oklch(0.55 0.25 265);
-    --primary-foreground: oklch(0.98 0 0);
+    --primary: oklch(0.55 0.22 260);
+    --primary-foreground: oklch(1 0 0);
 
-    --secondary: oklch(0.96 0.01 255);
-    --secondary-foreground: oklch(0.25 0.05 255);
+    --secondary: oklch(0.97 0.005 255);
+    --secondary-foreground: oklch(0.35 0.03 255);
 
-    --muted: oklch(0.96 0.01 240);
-    --muted-foreground: oklch(0.55 0.03 240);
+    --muted: oklch(0.97 0.005 255);
+    --muted-foreground: oklch(0.55 0.03 255);
 
-    --accent: oklch(0.94 0.03 250);
+    --accent: oklch(0.95 0.02 255);
     --accent-foreground: oklch(0.2 0.05 255);
 
     --destructive: oklch(0.6 0.25 25);
     --warning: oklch(0.85 0.18 85);
     --success: oklch(0.65 0.2 150);
 
-    --border: oklch(0.92 0.01 240);
-    --input: oklch(0.92 0.01 240);
-    --ring: oklch(0.55 0.25 265);
+    --border: oklch(0.92 0.005 255);
+    --input: oklch(0.92 0.005 255);
+    --ring: oklch(0.55 0.22 260);
 
     --sidebar: oklch(0.985 0.002 247.839);
     --sidebar-foreground: oklch(0.14 0.02 255);
@@ -76,33 +74,32 @@
 }
 
 .dark {
-    /* Fond "Midnight" profond, pas noir pur */
-    --background: oklch(0.12 0.03 260);
-    --foreground: oklch(0.98 0.01 240);
+    --background: oklch(0.12 0.01 260);
+    --foreground: oklch(0.98 0.005 255);
 
-    --card: oklch(0.15 0.03 260);
-    --card-foreground: oklch(0.98 0.01 240);
+    --card: oklch(0.18 0.01 260);
+    --card-foreground: oklch(0.98 0.005 255);
 
-    --popover: oklch(0.15 0.03 260);
-    --popover-foreground: oklch(0.98 0.01 240);
+    --popover: oklch(0.18 0.01 260);
+    --popover-foreground: oklch(0.98 0.005 255);
 
-    --primary: oklch(0.65 0.25 265);
-    --primary-foreground: oklch(0.12 0.03 260);
+    --primary: oklch(0.6 0.2 260);
+    --primary-foreground: oklch(1 0 0);
 
-    --secondary: oklch(0.2 0.04 260);
-    --secondary-foreground: oklch(0.98 0.01 240);
+    --secondary: oklch(0.25 0.02 260);
+    --secondary-foreground: oklch(0.98 0.005 255);
 
-    --muted: oklch(0.2 0.04 260);
-    --muted-foreground: oklch(0.65 0.05 255);
+    --muted: oklch(0.25 0.02 260);
+    --muted-foreground: oklch(0.7 0.02 260);
 
-    --accent: oklch(0.25 0.05 260);
-    --accent-foreground: oklch(0.98 0.01 240);
+    --accent: oklch(0.3 0.03 260);
+    --accent-foreground: oklch(0.98 0.005 255);
 
     --destructive: oklch(0.6 0.25 25);
 
-    --border: oklch(0.22 0.04 260);
-    --input: oklch(0.22 0.04 260);
-    --ring: oklch(0.65 0.25 265);
+    --border: oklch(0.25 0.02 260);
+    --input: oklch(0.25 0.02 260);
+    --ring: oklch(0.6 0.2 260);
 
     --sidebar: oklch(0.12 0.03 260);
     --sidebar-foreground: oklch(0.98 0.01 240);
@@ -125,11 +122,19 @@
 
 @layer utilities {
     .glass {
-        @apply bg-white/70 dark:bg-black/40 backdrop-blur-md border border-white/20 dark:border-white/10 shadow-sm supports-[backdrop-filter]:bg-white/60;
+        @apply bg-white/70 dark:bg-black/50 backdrop-blur-xl backdrop-saturate-150 border border-white/20 dark:border-white/10 shadow-sm supports-[backdrop-filter]:bg-white/60;
     }
 
     .glass-card {
-        @apply bg-card/80 backdrop-blur-sm hover:bg-card/90 transition-all duration-300 border border-border/50 shadow-sm hover:shadow-md hover:-translate-y-0.5;
+        @apply bg-white/50 dark:bg-gray-900/40 backdrop-blur-md backdrop-saturate-150 border border-white/40 dark:border-white/5 shadow-sm transition-all duration-300 hover:bg-white/60 dark:hover:bg-gray-900/60 hover:shadow-md;
+    }
+
+    .glass-heavy {
+        @apply bg-white/80 dark:bg-black/70 backdrop-blur-2xl backdrop-saturate-150 border-b border-white/20 dark:border-white/10;
+    }
+
+    .glass-popover {
+        @apply bg-white/95 dark:bg-zinc-900/95 backdrop-blur-3xl backdrop-saturate-150 border border-white/20 dark:border-white/10 shadow-2xl;
     }
 
     .no-scrollbar::-webkit-scrollbar {
@@ -143,6 +148,7 @@
 
 @layer components {
     .bg-surface {
-        @apply bg-card;
+        background-color: var(--card);
+        border: 1px solid var(--border);
     }
 }

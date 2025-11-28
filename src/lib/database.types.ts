@@ -9,6 +9,58 @@ export type Json =
 export interface Database {
     public: {
         Tables: {
+            tags: {
+                Row: {
+                    id: string;
+                    user_id: string;
+                    label: string;
+                    color: string;
+                    created_at: string;
+                };
+                Insert: {
+                    id?: string;
+                    user_id: string;
+                    label: string;
+                    color: string;
+                    created_at?: string;
+                };
+                Update: {
+                    id?: string;
+                    user_id?: string;
+                    label?: string;
+                    color?: string;
+                    created_at?: string;
+                };
+                Relationships: [];
+            };
+            application_tags: {
+                Row: {
+                    application_id: string;
+                    tag_id: string;
+                };
+                Insert: {
+                    application_id: string;
+                    tag_id: string;
+                };
+                Update: {
+                    application_id?: string;
+                    tag_id?: string;
+                };
+                Relationships: [
+                    {
+                        foreignKeyName: "application_tags_application_id_fkey";
+                        columns: ["application_id"];
+                        referencedRelation: "applications";
+                        referencedColumns: ["id"];
+                    },
+                    {
+                        foreignKeyName: "application_tags_tag_id_fkey";
+                        columns: ["tag_id"];
+                        referencedRelation: "tags";
+                        referencedColumns: ["id"];
+                    }
+                ];
+            };
             profiles: {
                 Row: {
                     id: string;
@@ -31,6 +83,7 @@ export interface Database {
                     created_at?: string;
                     updated_at?: string;
                 };
+                Relationships: [];
             };
             applications: {
                 Row: {
@@ -105,6 +158,14 @@ export interface Database {
                     created_at?: string;
                     updated_at?: string;
                 };
+                Relationships: [
+                    {
+                        foreignKeyName: "applications_user_id_fkey";
+                        columns: ["user_id"];
+                        referencedRelation: "users";
+                        referencedColumns: ["id"];
+                    }
+                ];
             };
             documents: {
                 Row: {
@@ -146,6 +207,14 @@ export interface Database {
                     match_percentage?: number;
                     created_at?: string;
                 };
+                Relationships: [
+                    {
+                        foreignKeyName: "documents_application_id_fkey";
+                        columns: ["application_id"];
+                        referencedRelation: "applications";
+                        referencedColumns: ["id"];
+                    }
+                ];
             };
             reminders: {
                 Row: {
@@ -172,6 +241,7 @@ export interface Database {
                     is_dismissed?: boolean;
                     created_at?: string;
                 };
+                Relationships: [];
             };
             contacts: {
                 Row: {
@@ -204,6 +274,7 @@ export interface Database {
                     notes?: string;
                     created_at?: string;
                 };
+                Relationships: [];
             };
             tasks: {
                 Row: {
@@ -233,6 +304,7 @@ export interface Database {
                     created_at?: string;
                     completed_at?: string | null;
                 };
+                Relationships: [];
             };
             activity_history: {
                 Row: {
@@ -277,6 +349,7 @@ export interface Database {
                     metadata?: Json;
                     created_at?: string;
                 };
+                Relationships: [];
             };
             victory_reports: {
                 Row: {
@@ -303,6 +376,7 @@ export interface Database {
                     advice_to_past_self?: string;
                     created_at?: string;
                 };
+                Relationships: [];
             };
         };
     };

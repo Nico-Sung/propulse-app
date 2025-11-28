@@ -8,6 +8,7 @@ import {
     Briefcase,
     Calendar,
     CheckSquare,
+    FileText,
     LayoutDashboard,
     LogOut,
 } from "lucide-react";
@@ -75,14 +76,12 @@ function ShellLayout({ children }: { children: React.ReactNode }) {
 
     return (
         <div className="flex flex-col min-h-screen bg-background selection:bg-primary/20">
-            {/* Header Sticky avec effet Glass */}
-            <header className="sticky top-0 z-40 w-full bg-background/80 backdrop-blur-md border-b border-border/50">
+            <header className="sticky top-0 z-40 w-full glass">
                 <div className="px-6 h-16 flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                        {/* Logo avec un léger glow */}
                         <div className="relative group">
                             <div className="absolute -inset-0.5 bg-gradient-to-r from-primary to-accent rounded-xl opacity-30 group-hover:opacity-60 blur transition duration-500"></div>
-                            <div className="relative bg-background rounded-xl p-1.5 border border-border">
+                            <div className="relative bg-background/50 rounded-xl p-1.5 border border-white/20 shadow-sm">
                                 <Image
                                     src="/logo.png"
                                     alt="Propulse"
@@ -98,7 +97,6 @@ function ShellLayout({ children }: { children: React.ReactNode }) {
                             </h1>
                         </div>
 
-                        {/* Navigation */}
                         <div className="hidden md:flex ml-8">
                             <Tabs
                                 value={tab}
@@ -123,6 +121,11 @@ function ShellLayout({ children }: { children: React.ReactNode }) {
                                             icon: Calendar,
                                         },
                                         {
+                                            id: "documents",
+                                            label: "Documents",
+                                            icon: FileText,
+                                        },
+                                        {
                                             id: "analytics",
                                             label: "Données",
                                             icon: BarChart3,
@@ -131,7 +134,7 @@ function ShellLayout({ children }: { children: React.ReactNode }) {
                                         <TabsTrigger
                                             key={item.id}
                                             value={item.id}
-                                            className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-muted-foreground rounded-md transition-all hover:text-foreground hover:bg-muted/50 data-[state=active]:text-primary data-[state=active]:bg-primary/10 data-[state=active]:shadow-none border-0 h-auto"
+                                            className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-muted-foreground rounded-md transition-all hover:text-foreground hover:bg-black/5 dark:hover:bg-white/10 data-[state=active]:text-primary data-[state=active]:bg-primary/10 data-[state=active]:shadow-none border-0 h-auto"
                                         >
                                             <item.icon className="w-4 h-4" />
                                             {item.label}
@@ -166,7 +169,7 @@ function ShellLayout({ children }: { children: React.ReactNode }) {
                                 </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent
-                                className="w-56"
+                                className="w-56 glass-card border-none"
                                 align="end"
                                 forceMount
                             >
@@ -180,10 +183,10 @@ function ShellLayout({ children }: { children: React.ReactNode }) {
                                         </p>
                                     </div>
                                 </DropdownMenuLabel>
-                                <DropdownMenuSeparator />
+                                <DropdownMenuSeparator className="bg-border/50" />
                                 <DropdownMenuItem
                                     onClick={signOut}
-                                    className="text-destructive focus:text-destructive"
+                                    className="text-destructive focus:text-destructive focus:bg-destructive/10"
                                 >
                                     <LogOut className="mr-2 h-4 w-4" />
                                     <span>Déconnexion</span>
@@ -193,7 +196,6 @@ function ShellLayout({ children }: { children: React.ReactNode }) {
                     </div>
                 </div>
 
-                {/* Mobile Navigation */}
                 <div className="md:hidden px-4 pb-3 overflow-x-auto no-scrollbar">
                     <Tabs
                         value={tab}

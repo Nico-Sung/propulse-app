@@ -23,7 +23,7 @@ export default function CalendarView() {
             setEvents([]);
             setLoading(false);
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
+        
     }, [user]);
 
     const loadApplications = async () => {

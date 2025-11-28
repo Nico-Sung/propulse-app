@@ -4,7 +4,6 @@ import { useState, useEffect, useMemo } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import { useAuth } from "@/contexts/AuthContext";
 import { Database } from "@/lib/database.types";
-import { ApplicationCard } from "./ApplicationCard";
 import { EditApplicationSheet } from "./modal/EditApplicationModal";
 import { AddApplicationDialog } from "./modal/AddApplicationModal";
 import {
@@ -18,12 +17,7 @@ import {
     closestCenter,
     UniqueIdentifier,
 } from "@dnd-kit/core";
-import {
-    SortableContext,
-    rectSortingStrategy,
-    arrayMove,
-} from "@dnd-kit/sortable";
-import { KanbanColumn } from "./KanbanColumn";
+import { KanbanColumn, SortOption, ViewMode } from "./KanbanColumn";
 import Spinner from "@/components/ui/Spinner";
 import { OverlayCard } from "@/components/design-system/overlay-card";
 
@@ -49,6 +43,26 @@ export default function KanbanBoard({
     const [loading, setLoading] = useState(true);
     const { user } = useAuth();
 
+    const [sortOption, setSortOption] = useState<SortOption>("date_desc");
+    const [viewMode, setViewMode] = useState<ViewMode>("normal");
+
+    useEffect(() => {
+        const savedSort = localStorage.getItem("kanban_sort");
+        const savedView = localStorage.getItem("kanban_view");
+        if (savedSort) setSortOption(savedSort as SortOption);
+        if (savedView) setViewMode(savedView as ViewMode);
+    }, []);
+
+    const handleSortChange = (option: SortOption) => {
+        setSortOption(option);
+        localStorage.setItem("kanban_sort", option);
+    };
+
+    const handleViewChange = (mode: ViewMode) => {
+        setViewMode(mode);
+        localStorage.setItem("kanban_view", mode);
+    };
+
     const sensors = useSensors(
         useSensor(PointerSensor, { activationConstraint: { distance: 8 } })
     );
@@ -72,14 +86,13 @@ export default function KanbanBoard({
         useState<Application | null>(null);
     const [isSheetOpen, setIsSheetOpen] = useState(false);
 
-    const itemsByColumn = useMemo(() => {
-        const map: Record<string, UniqueIdentifier[]> = {};
-        COLUMNS.forEach((c) => (map[c.id] = []));
-        applications.forEach((a) => {
-            if (map[a.status]) map[a.status].push(a.id as UniqueIdentifier);
-        });
-        return map;
-    }, [applications]);
+    const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+    const [defaultStatus, setDefaultStatus] = useState<string>("to_apply");
+
+    const handleOpenAddModal = (status: string) => {
+        setDefaultStatus(status);
+        setIsAddModalOpen(true);
+    };
 
     const handleDragStart = (event: DragStartEvent) => {
         setActiveId(event.active.id as UniqueIdentifier);
@@ -176,36 +189,30 @@ export default function KanbanBoard({
                                 <KanbanColumn
                                     key={column.id}
                                     column={column}
-                                    items={itemsByColumn[column.id]}
-                                >
-                                    <SortableContext
-                                        items={itemsByColumn[column.id] || []}
-                                        strategy={rectSortingStrategy}
-                                    >
-                                        <div
-                                            className={`flex-1 rounded-lg p-3 space-y-3 min-h-max`}
-                                        >
-                                            {columnApps.map((app) => (
-                                                <ApplicationCard
-                                                    key={app.id}
-                                                    application={app}
-                                                    onCardClick={() => {
-                                                        setSelectedApplication(
-                                                            app
-                                                        );
-                                                        setIsSheetOpen(true);
-                                                    }}
-                                                />
-                                            ))}
-                                        </div>
-                                    </SortableContext>
-                                </KanbanColumn>
+                                    applications={columnApps}
+                                    sortOption={sortOption}
+                                    onSortChange={handleSortChange}
+                                    viewMode={viewMode}
+                                    onViewModeChange={handleViewChange}
+                                    onCardClick={(app) => {
+                                        setSelectedApplication(app);
+                                        setIsSheetOpen(true);
+                                    }}
+                                    onAddApplication={() =>
+                                        handleOpenAddModal(column.id)
+                                    }
+                                />
                             );
                         })}
                     </div>
                 </div>
 
-                <AddApplicationDialog />
+                <AddApplicationDialog
+                    open={isAddModalOpen}
+                    setOpen={setIsAddModalOpen}
+                    defaultStatus={defaultStatus}
+                />
+
                 <EditApplicationSheet
                     application={selectedApplication}
                     isOpen={isSheetOpen}

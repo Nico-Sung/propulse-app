@@ -2,7 +2,12 @@
 
 import React, { createContext, useContext, useState } from "react";
 
-type TabValue = "dashboard" | "actions" | "calendar" | "analytics";
+type TabValue =
+    | "dashboard"
+    | "actions"
+    | "calendar"
+    | "analytics"
+    | "documents";
 
 type DashboardTabContextType = {
     tab: TabValue;
