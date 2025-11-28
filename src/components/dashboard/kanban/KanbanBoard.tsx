@@ -20,6 +20,7 @@ import {
 import { KanbanColumn, SortOption, ViewMode } from "./KanbanColumn";
 import Spinner from "@/components/ui/Spinner";
 import { OverlayCard } from "@/components/design-system/overlay-card";
+import { useKanbanTags } from "@/hooks/useKanbanTags";
 
 type Application = Database["public"]["Tables"]["applications"]["Row"];
 
@@ -42,6 +43,8 @@ export default function KanbanBoard({
     );
     const [loading, setLoading] = useState(true);
     const { user } = useAuth();
+
+    const tagsData = useKanbanTags();
 
     const [sortOption, setSortOption] = useState<SortOption>("date_desc");
     const [viewMode, setViewMode] = useState<ViewMode>("normal");
@@ -136,7 +139,7 @@ export default function KanbanBoard({
         const { error } = await (supabase as any)
             .from("applications")
             .update({
-                status: newStatus as Application["status"],
+                status: newStatus,
                 updated_at: new Date().toISOString(),
                 ...(newStatus === "applied" && {
                     application_date: new Date().toISOString(),
@@ -203,6 +206,7 @@ export default function KanbanBoard({
                                     onAddApplication={() =>
                                         handleOpenAddModal(column.id)
                                     }
+                                    tagsData={tagsData}
                                 />
                             );
                         })}

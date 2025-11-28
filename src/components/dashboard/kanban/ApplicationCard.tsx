@@ -54,6 +54,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 type Application = Database["public"]["Tables"]["applications"]["Row"];
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+type ApplicationInsert = Database["public"]["Tables"]["applications"]["Insert"];
 
 const COLUMN_LABELS = {
     to_apply: "À postuler",
@@ -68,10 +70,12 @@ export function ApplicationCard({
     application,
     onCardClick,
     compact = false,
+    tagsData,
 }: {
     application: Application;
     onCardClick: () => void;
     compact?: boolean;
+    tagsData: ReturnType<typeof useKanbanTags>;
 }) {
     const {
         attributes,
@@ -83,7 +87,7 @@ export function ApplicationCard({
     } = useSortable({ id: application.id });
 
     const { allTags, getAppTags, toggleTagForApp, createTag, deleteTag } =
-        useKanbanTags();
+        tagsData;
     const appTags = getAppTags(application.id);
 
     const [newTagLabel, setNewTagLabel] = useState("");
@@ -99,8 +103,7 @@ export function ApplicationCard({
     const [showDialog, setShowDialog] = useState(false);
 
     const handleDelete = async () => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const { error } = await (supabase as any)
+        const { error } = await supabase
             .from("applications")
             .delete()
             .eq("id", application.id);
@@ -113,16 +116,29 @@ export function ApplicationCard({
     };
 
     const handleDuplicate = async () => {
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const { id, created_at, updated_at, ...rest } = application;
+        // On utilise 'any' pour contourner l'erreur de typage stricte de Supabase sur l'insert
+        // L'objet est valide, mais les types générés peuvent être capricieux
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const { error } = await (supabase as any).from("applications").insert({
-            ...rest,
-            position_title: `${rest.position_title} (Copie)`,
+            user_id: application.user_id,
+            company_name: application.company_name,
+            position_title: `${application.position_title} (Copie)`,
+            job_description: application.job_description,
+            status: application.status,
+            application_date: application.application_date,
+            last_contact_date: application.last_contact_date,
+            notes: application.notes,
+            job_url: application.job_url,
+            contract_type: application.contract_type,
+            deadline: application.deadline,
+            interview_date: application.interview_date,
+            salary_range: application.salary_range,
             created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
         });
 
         if (error) {
+            console.error(error);
             toast.error("Erreur lors de la duplication");
         } else {
             toast.success("Candidature dupliquée");
@@ -137,7 +153,7 @@ export function ApplicationCard({
         const { error } = await (supabase as any)
             .from("applications")
             .update({
-                status,
+                status: status,
                 updated_at: new Date().toISOString(),
             })
             .eq("id", application.id);
@@ -258,7 +274,6 @@ export function ApplicationCard({
                                                 </Button>
                                             </DropdownMenuTrigger>
 
-                                            {}
                                             <DropdownMenuContent
                                                 align="end"
                                                 className="w-72 bg-white/95 dark:bg-zinc-900/95 backdrop-blur-xl border border-white/20 shadow-xl p-1"
@@ -551,8 +566,8 @@ export function ApplicationCard({
 
                                     {application.salary_range && (
                                         <Badge
-                                            variant="secondary"
-                                            className="text-[10px] px-1.5 h-5 border-border/50 font-normal bg-secondary backdrop-blur-sm"
+                                            variant="outline"
+                                            className="text-[10px] px-1.5 h-5 border-border/50 text-muted-foreground font-normal bg-white/50 backdrop-blur-sm"
                                         >
                                             {application.salary_range}
                                         </Badge>

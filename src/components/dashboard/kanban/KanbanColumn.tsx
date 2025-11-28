@@ -20,6 +20,7 @@ import { Database } from "@/lib/database.types";
 import { ApplicationCard } from "./ApplicationCard";
 import { SortableContext, rectSortingStrategy } from "@dnd-kit/sortable";
 import { Button } from "@/components/ui/button";
+import { useKanbanTags } from "@/hooks/useKanbanTags";
 
 type Application = Database["public"]["Tables"]["applications"]["Row"];
 
@@ -35,6 +36,7 @@ interface KanbanColumnProps {
     viewMode: ViewMode;
     onViewModeChange: (mode: ViewMode) => void;
     onAddApplication: () => void;
+    tagsData: ReturnType<typeof useKanbanTags>;
 }
 
 export function KanbanColumn({
@@ -46,6 +48,7 @@ export function KanbanColumn({
     viewMode,
     onViewModeChange,
     onAddApplication,
+    tagsData,
 }: KanbanColumnProps) {
     const { setNodeRef, isOver } = useDroppable({ id: column.id });
 
@@ -140,11 +143,11 @@ export function KanbanColumn({
             </div>
 
             <ContextMenu>
-                <ContextMenuTrigger className="flex-1 flex flex-col h-full">
+                <ContextMenuTrigger className="flex flex-col">
                     <div
                         ref={setNodeRef}
                         className={cn(
-                            "flex-1 rounded-2xl transition-all duration-300 p-2 border h-fit min-h-[150px] backdrop-blur-[2px] flex flex-col gap-3",
+                            "rounded-2xl transition-all duration-300 p-2 border h-fit min-h-[150px] backdrop-blur-[2px] flex flex-col gap-3",
                             columnBgMap[column.id] ||
                                 "bg-muted/20 border-transparent",
                             isOver
@@ -162,6 +165,7 @@ export function KanbanColumn({
                                     application={app}
                                     onCardClick={() => onCardClick(app)}
                                     compact={viewMode === "compact"}
+                                    tagsData={tagsData}
                                 />
                             ))}
                         </SortableContext>
@@ -169,7 +173,7 @@ export function KanbanColumn({
                         <Button
                             variant="ghost"
                             className={cn(
-                                "w-full justify-start h-9 px-2 text-sm mt-1 transition-all duration-200 backdrop-blur-sm bg-white/30 dark:bg-black/20 border border-transparent hover:border-black/5 dark:hover:border-white/5",
+                                "w-full justify-start h-9 px-2 text-sm transition-all duration-200 backdrop-blur-sm bg-white/30 dark:bg-black/20 border border-transparent hover:border-black/5 dark:hover:border-white/5",
                                 buttonColorMap[column.id] ||
                                     "text-muted-foreground hover:text-primary hover:bg-background/50"
                             )}

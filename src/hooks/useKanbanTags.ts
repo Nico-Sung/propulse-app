@@ -6,6 +6,7 @@ import { Database } from "@/lib/database.types";
 import { toast } from "sonner";
 
 export type Tag = Database["public"]["Tables"]["tags"]["Row"];
+
 type ApplicationTag = Database["public"]["Tables"]["application_tags"]["Row"];
 
 export const TAG_COLORS = [
@@ -29,6 +30,7 @@ export function useKanbanTags() {
 
     const load = async () => {
         try {
+            setLoading(true);
             const { data: tagsData, error: tagsError } = await supabase
                 .from("tags")
                 .select("*")
@@ -38,7 +40,8 @@ export function useKanbanTags() {
 
             const { data: assignData, error: assignError } = await supabase
                 .from("application_tags")
-                .select("*");
+                .select("*")
+                .returns<ApplicationTag[]>();
 
             if (assignError) throw assignError;
 
@@ -46,7 +49,7 @@ export function useKanbanTags() {
 
             if (assignData) {
                 const newAssignments: Record<string, string[]> = {};
-                (assignData as ApplicationTag[]).forEach((item) => {
+                assignData.forEach((item) => {
                     if (!newAssignments[item.application_id]) {
                         newAssignments[item.application_id] = [];
                     }
@@ -65,7 +68,7 @@ export function useKanbanTags() {
         load();
 
         const channel = supabase
-            .channel("tags_updates")
+            .channel("tags_updates_global")
             .on(
                 "postgres_changes",
                 { event: "*", schema: "public", table: "tags" },
@@ -106,11 +109,7 @@ export function useKanbanTags() {
     };
 
     const deleteTag = async (tagId: string) => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const { error } = await (supabase as any)
-            .from("tags")
-            .delete()
-            .eq("id", tagId);
+        const { error } = await supabase.from("tags").delete().eq("id", tagId);
 
         if (error) {
             toast.error("Impossible de supprimer l'étiquette");
@@ -138,8 +137,7 @@ export function useKanbanTags() {
         setAssignments({ ...assignments, [appId]: newAppTags });
 
         if (isAssigned) {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const { error } = await (supabase as any)
+            const { error } = await supabase
                 .from("application_tags")
                 .delete()
                 .eq("application_id", appId)
@@ -148,7 +146,6 @@ export function useKanbanTags() {
             if (error) {
                 console.error(error);
                 toast.error("Erreur lors du retrait");
-
                 load();
             }
         } else {
@@ -169,11 +166,12 @@ export function useKanbanTags() {
         const tagIds = assignments[appId] || [];
         return tagIds
             .map((id) => allTags.find((t) => t.id === id))
-            .filter(Boolean) as Tag[];
+            .filter((t): t is Tag => t !== undefined);
     };
 
     return {
         allTags,
+        assignments,
         createTag,
         deleteTag,
         toggleTagForApp,
