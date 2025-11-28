@@ -1,6 +1,6 @@
 "use client";
 
-import { UniqueIdentifier, useDroppable } from "@dnd-kit/core";
+import { useDroppable } from "@dnd-kit/core";
 import { cn } from "@/lib/utils";
 import {
     ContextMenu,
@@ -14,15 +14,7 @@ import {
     ContextMenuSubContent,
     ContextMenuCheckboxItem,
 } from "@/components/ui/context-menu";
-import {
-    PlusCircle,
-    RotateCw,
-    SortAsc,
-    Trash2,
-    Palette,
-    Plus,
-} from "lucide-react";
-import { toast } from "sonner";
+import { PlusCircle, RotateCw, SortAsc, Palette, Plus } from "lucide-react";
 import { useMemo } from "react";
 import { Database } from "@/lib/database.types";
 import { ApplicationCard } from "./ApplicationCard";
@@ -218,14 +210,14 @@ export function KanbanColumn({
                                 }
                                 className="rounded-md focus:bg-primary/10 focus:text-primary"
                             >
-                                Date d'ajout (Récent)
+                                Date d&apos;ajout (Récent)
                             </ContextMenuCheckboxItem>
                             <ContextMenuCheckboxItem
                                 checked={sortOption === "date_asc"}
                                 onCheckedChange={() => onSortChange("date_asc")}
                                 className="rounded-md focus:bg-primary/10 focus:text-primary"
                             >
-                                Date d'ajout (Ancien)
+                                Date d&apos;ajout (Ancien)
                             </ContextMenuCheckboxItem>
                             <ContextMenuCheckboxItem
                                 checked={sortOption === "name_asc"}
