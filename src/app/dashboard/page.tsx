@@ -5,9 +5,12 @@ import DashboardShell from "@/components/dashboard/DashboardShell";
 
 async function getApplications() {
     const cookieStore = await cookies();
+
     const supabase = createServerComponentClient<Database>({
-        cookies: ((): any => cookieStore) as any,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        cookies: () => cookieStore as any,
     });
+
     const {
         data: { session },
     } = await supabase.auth.getSession();

@@ -5,7 +5,6 @@ import { useRouter, usePathname } from "next/navigation";
 import { useEffect } from "react";
 import {
     BarChart3,
-    Briefcase,
     Calendar,
     CheckSquare,
     FileText,
@@ -30,7 +29,14 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Spinner from "@/components/ui/Spinner";
 import ThemeToggle from "@/components/design-system/theme-toggle";
 import Image from "next/image";
-import { cn } from "@/lib/utils";
+
+// Define local type since it is not exported from context
+type TabValue =
+    | "dashboard"
+    | "actions"
+    | "calendar"
+    | "analytics"
+    | "documents";
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
     const { user, loading } = useAuth();
@@ -60,18 +66,28 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 function ShellLayout({ children }: { children: React.ReactNode }) {
     const { tab, setTab } = useDashboardTab();
     const { user, signOut } = useAuth();
-    const router = useRouter();
     const pathname = usePathname();
 
     useEffect(() => {
-        const active = (pathname.split("/").pop() as any) || "dashboard";
-        if (active && active !== tab) {
+        const lastSegment = pathname.split("/").pop();
+        const active = (lastSegment || "dashboard") as TabValue;
+
+        const supportedTabs: TabValue[] = [
+            "dashboard",
+            "actions",
+            "calendar",
+            "analytics",
+            "documents",
+        ];
+
+        if (active && supportedTabs.includes(active) && active !== tab) {
             setTab(active);
         }
-    }, [pathname]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [pathname, setTab]);
 
     const handleNavigate = (value: string) => {
-        setTab(value as any);
+        setTab(value as TabValue);
     };
 
     return (
