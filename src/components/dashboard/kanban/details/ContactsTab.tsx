@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import { Database } from "@/lib/database.types";
 import { Button } from "@/components/ui/button";
@@ -46,18 +46,19 @@ export function ContactsTab({ applicationId }: ContactSectionProps) {
         setShowDialog(true);
     };
 
-    useEffect(() => {
-        if (applicationId) loadContacts();
-    }, [applicationId]);
-
-    const loadContacts = async () => {
+    const loadContacts = useCallback(async () => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const { data } = await (supabase as any)
             .from("contacts")
             .select("*")
             .eq("application_id", applicationId)
             .order("created_at", { ascending: false });
         if (data) setContacts(data as Contact[]);
-    };
+    }, [applicationId]);
+
+    useEffect(() => {
+        if (applicationId) loadContacts();
+    }, [applicationId, loadContacts]);
 
     const resetForm = () => {
         setFormData(initialFormState);
@@ -78,6 +79,7 @@ export function ContactsTab({ applicationId }: ContactSectionProps) {
     };
 
     const handleDelete = async (contactId: string): Promise<boolean> => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const { error } = await (supabase as any)
             .from("contacts")
             .delete()
@@ -95,15 +97,18 @@ export function ContactsTab({ applicationId }: ContactSectionProps) {
         setLoading(true);
 
         if (editingId) {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             await (supabase as any)
                 .from("contacts")
                 .update(formData)
                 .eq("id", editingId);
         } else {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const { error } = await (supabase as any)
                 .from("contacts")
                 .insert({ application_id: applicationId, ...formData });
             if (!error) {
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 await (supabase as any).from("activity_history").insert({
                     application_id: applicationId,
                     activity_type: "contact_added",

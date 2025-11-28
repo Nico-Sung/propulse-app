@@ -11,7 +11,6 @@ import FunnelStep from "./FunnelStep";
 import InsightsList from "./InsightsList";
 
 type Application = Database["public"]["Tables"]["applications"]["Row"];
-type VictoryReport = Database["public"]["Tables"]["victory_reports"]["Row"];
 
 interface Stats {
     total: number;
@@ -29,118 +28,106 @@ interface Insight {
     description: string;
 }
 
+const calculateStats = (apps: Application[]): Stats => {
+    const total = apps.length;
+    const applied = apps.filter((a) =>
+        ["applied", "waiting", "interview", "offer", "rejected"].includes(
+            a.status
+        )
+    ).length;
+    const interviews = apps.filter(
+        (a) => a.status === "interview" || a.status === "offer"
+    ).length;
+    const offers = apps.filter((a) => a.status === "offer").length;
+    const rejected = apps.filter((a) => a.status === "rejected").length;
+    const conversionRate =
+        applied > 0 ? Math.round((interviews / applied) * 100) : 0;
+
+    const appsWithDates = apps.filter(
+        (a) => a.application_date && a.last_contact_date
+    );
+    let averageResponseTime = 0;
+    if (appsWithDates.length > 0) {
+        const totalDays = appsWithDates.reduce((sum, app) => {
+            const appDate = new Date(app.application_date!);
+            const contactDate = new Date(app.last_contact_date!);
+            const diffTime = Math.abs(
+                contactDate.getTime() - appDate.getTime()
+            );
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            return sum + diffDays;
+        }, 0);
+        averageResponseTime = Math.round(totalDays / appsWithDates.length);
+    }
+
+    return {
+        total,
+        applied,
+        interviews,
+        offers,
+        rejected,
+        conversionRate,
+        averageResponseTime,
+    };
+};
+
+const generateInsights = (stats: Stats): Insight[] => {
+    const insightsList: Insight[] = [];
+
+    if (stats.interviews > 0 && stats.applied > 0) {
+        const interviewRate = (stats.interviews / stats.applied) * 100;
+        if (interviewRate > 25) {
+            insightsList.push({
+                type: "success",
+                title: "Excellent taux de conversion !",
+                description: `Votre taux de passage en entretien est de ${Math.round(
+                    interviewRate
+                )}%.`,
+            });
+        }
+    }
+    if (stats.averageResponseTime > 5) {
+        insightsList.push({
+            type: "warning",
+            title: "Délai de réponse élevé",
+            description: `Votre délai moyen de réponse est de ${stats.averageResponseTime} jours. Essayez de répondre plus rapidement aux recruteurs.`,
+        });
+    }
+
+    return insightsList;
+};
+
 export default function AnalyticsPanel() {
-    const [applications, setApplications] = useState<Application[]>([]);
-    const [victoryReports, setVictoryReports] = useState<VictoryReport[]>([]);
     const [stats, setStats] = useState<Stats | null>(null);
     const [insights, setInsights] = useState<Insight[]>([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        loadData();
-    }, []);
-
-    const loadData = async () => {
-        setLoading(true);
-        try {
-            const [appsData, reportsData] = await Promise.all([
-                supabase
+        const loadData = async () => {
+            setLoading(true);
+            try {
+                const { data: appsData } = await supabase
                     .from("applications")
                     .select("*")
-                    .order("created_at", { ascending: false }),
-                supabase.from("victory_reports").select("*, applications(*)"),
-            ]);
+                    .order("created_at", { ascending: false });
 
-            if (appsData.data) {
-                setApplications(appsData.data as Application[]);
-                const calculatedStats = calculateStats(
-                    appsData.data as Application[]
-                );
-                setStats(calculatedStats);
-                generateInsights(
-                    appsData.data as Application[],
-                    calculatedStats
-                );
+                if (appsData) {
+                    const apps = appsData as Application[];
+                    const calculatedStats = calculateStats(apps);
+                    setStats(calculatedStats);
+
+                    const generatedInsights = generateInsights(calculatedStats);
+                    setInsights(generatedInsights);
+                }
+            } catch (err) {
+                console.error("Error loading analytics data", err);
+            } finally {
+                setLoading(false);
             }
-
-            if (reportsData.data) {
-                setVictoryReports(reportsData.data as any);
-            }
-        } catch (err) {
-            console.error("Error loading analytics data", err);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const calculateStats = (apps: Application[]): Stats => {
-        const total = apps.length;
-        const applied = apps.filter((a) =>
-            ["applied", "waiting", "interview", "offer", "rejected"].includes(
-                a.status
-            )
-        ).length;
-        const interviews = apps.filter(
-            (a) => a.status === "interview" || a.status === "offer"
-        ).length;
-        const offers = apps.filter((a) => a.status === "offer").length;
-        const rejected = apps.filter((a) => a.status === "rejected").length;
-        const conversionRate =
-            applied > 0 ? Math.round((interviews / applied) * 100) : 0;
-
-        const appsWithDates = apps.filter(
-            (a) => a.application_date && a.last_contact_date
-        );
-        let averageResponseTime = 0;
-        if (appsWithDates.length > 0) {
-            const totalDays = appsWithDates.reduce((sum, app) => {
-                const appDate = new Date(app.application_date!);
-                const contactDate = new Date(app.last_contact_date!);
-                const diffTime = Math.abs(
-                    contactDate.getTime() - appDate.getTime()
-                );
-                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-                return sum + diffDays;
-            }, 0);
-            averageResponseTime = Math.round(totalDays / appsWithDates.length);
-        }
-
-        return {
-            total,
-            applied,
-            interviews,
-            offers,
-            rejected,
-            conversionRate,
-            averageResponseTime,
         };
-    };
 
-    const generateInsights = (apps: Application[], stats: Stats) => {
-        const insightsList: Insight[] = [];
-
-        if (stats.interviews > 0 && stats.applied > 0) {
-            const interviewRate = (stats.interviews / stats.applied) * 100;
-            if (interviewRate > 25) {
-                insightsList.push({
-                    type: "success",
-                    title: "Excellent taux de conversion !",
-                    description: `Votre taux de passage en entretien est de ${Math.round(
-                        interviewRate
-                    )}%.`,
-                });
-            }
-        }
-        if (stats.averageResponseTime > 5) {
-            insightsList.push({
-                type: "warning",
-                title: "Délai de réponse élevé",
-                description: `Votre délai moyen de réponse est de ${stats.averageResponseTime} jours. Essayez de répondre plus rapidement aux recruteurs.`,
-            });
-        }
-
-        setInsights(insightsList);
-    };
+        loadData();
+    }, []);
 
     if (loading) {
         return (

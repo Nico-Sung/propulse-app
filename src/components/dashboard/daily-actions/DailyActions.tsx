@@ -19,6 +19,10 @@ import { DailyActionsList } from "./DailyActionsList";
 type Application = Database["public"]["Tables"]["applications"]["Row"];
 type Task = Database["public"]["Tables"]["tasks"]["Row"];
 
+type TaskWithApplication = Task & {
+    applications: Application | null;
+};
+
 export interface DailyAction {
     id: string;
     type: "task" | "deadline" | "follow_up";
@@ -49,15 +53,15 @@ export default function DailyActions({
         setLoading(true);
         const today = new Date();
         today.setHours(0, 0, 0, 0);
-        const tomorrow = new Date(today);
-        tomorrow.setDate(tomorrow.getDate() + 1);
 
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const { data: apps } = await (supabase as any)
             .from("applications")
             .select("*")
             .order("created_at", { ascending: false });
 
-        const { data: tasks } = await (supabase as any)
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const { data: tasksData } = await (supabase as any)
             .from("tasks")
             .select("*, applications(*)")
             .eq("is_completed", false);
@@ -85,10 +89,10 @@ export default function DailyActions({
                                     ? "medium"
                                     : "low",
                             application: app,
-                            description: `Date limite dans ${
+                            description: `Date limite ${
                                 daysUntilDeadline === 0
                                     ? "aujourd'hui"
-                                    : `${daysUntilDeadline} jour${
+                                    : `dans ${daysUntilDeadline} jour${
                                           daysUntilDeadline > 1 ? "s" : ""
                                       }`
                             }`,
@@ -123,15 +127,17 @@ export default function DailyActions({
             });
         }
 
-        if (tasks) {
-            (tasks as any).forEach((task: any) => {
+        if (tasksData) {
+            const tasks = tasksData as unknown as TaskWithApplication[];
+
+            tasks.forEach((task) => {
                 if (task.applications) {
                     actionsList.push({
                         id: `task-${task.id}`,
                         type: "task",
                         priority: "medium",
-                        application: task.applications as Application,
-                        task: task as Task,
+                        application: task.applications,
+                        task: task,
                         description: task.title,
                     });
                 }
@@ -155,6 +161,7 @@ export default function DailyActions({
 
     const completeTask = async (action: DailyAction) => {
         if (action.type === "task" && action.task) {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             await (supabase as any)
                 .from("tasks")
                 .update({
@@ -163,6 +170,7 @@ export default function DailyActions({
                 })
                 .eq("id", action.task.id);
 
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             await (supabase as any).from("activity_history").insert({
                 application_id: action.application.id,
                 activity_type: "task_completed",
@@ -180,7 +188,7 @@ export default function DailyActions({
                     Actions du jour
                 </CardTitle>
                 <CardDescription className="text-base text-muted-foreground">
-                    Concentrez-vous sur l'essentiel
+                    Concentrez-vous sur l&apos;essentiel
                 </CardDescription>
             </CardHeader>
             <CardContent>
@@ -198,7 +206,7 @@ export default function DailyActions({
                             Tout est à jour !
                         </h3>
                         <p className="text-muted-foreground">
-                            Aucune action urgente pour aujourd'hui
+                            Aucune action urgente pour aujourd&apos;hui
                         </p>
                     </div>
                 ) : (

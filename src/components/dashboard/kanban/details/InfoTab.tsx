@@ -41,6 +41,7 @@ export function InfoTab({
 
     const handleSave = async () => {
         setLoading(true);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const { error } = await (supabase as any)
             .from("applications")
             .update({
@@ -52,6 +53,7 @@ export function InfoTab({
             .eq("id", application.id);
 
         if (!error) {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             await (supabase as any).from("activity_history").insert({
                 application_id: application.id,
                 activity_type: "note",
@@ -150,7 +152,7 @@ export function InfoTab({
                     {application.job_url && (
                         <div>
                             <label className="block text-sm font-semibold text-foreground mb-2">
-                                Lien vers l'offre
+                                Lien vers l&apos;offre
                             </label>
                             <a
                                 href={application.job_url}
@@ -207,7 +209,7 @@ export function InfoTab({
                             </label>
                             <Input
                                 value={formData.company_name as string}
-                                onChange={(e: any) =>
+                                onChange={(e) =>
                                     setFormData({
                                         ...formData,
                                         company_name: e.target.value,
@@ -222,7 +224,7 @@ export function InfoTab({
                             </label>
                             <Input
                                 value={formData.position_title as string}
-                                onChange={(e: any) =>
+                                onChange={(e) =>
                                     setFormData({
                                         ...formData,
                                         position_title: e.target.value,
@@ -269,7 +271,7 @@ export function InfoTab({
                             </label>
                             <Input
                                 value={String(formData.salary_range || "")}
-                                onChange={(e: any) =>
+                                onChange={(e) =>
                                     setFormData({
                                         ...formData,
                                         salary_range: e.target.value,
@@ -288,7 +290,7 @@ export function InfoTab({
                             <Input
                                 type="date"
                                 value={formData.deadline}
-                                onChange={(e: any) =>
+                                onChange={(e) =>
                                     setFormData({
                                         ...formData,
                                         deadline: e.target.value,
@@ -299,12 +301,12 @@ export function InfoTab({
 
                         <div>
                             <label className="block text-sm font-semibold text-foreground mb-2">
-                                Date d'entretien
+                                Date d&apos;entretien
                             </label>
                             <Input
                                 type="datetime-local"
                                 value={formData.interview_date}
-                                onChange={(e: any) =>
+                                onChange={(e) =>
                                     setFormData({
                                         ...formData,
                                         interview_date: e.target.value,
@@ -316,12 +318,12 @@ export function InfoTab({
 
                     <div>
                         <label className="block text-sm font-semibold text-foreground mb-2">
-                            Lien vers l'offre
+                            Lien vers l&apos;offre
                         </label>
                         <Input
                             type="url"
                             value={(formData.job_url as string) || ""}
-                            onChange={(e: any) =>
+                            onChange={(e) =>
                                 setFormData({
                                     ...formData,
                                     job_url: e.target.value,
@@ -337,7 +339,7 @@ export function InfoTab({
                         </label>
                         <Textarea
                             value={(formData.job_description as string) || ""}
-                            onChange={(e: any) =>
+                            onChange={(e) =>
                                 setFormData({
                                     ...formData,
                                     job_description: e.target.value,
@@ -353,7 +355,7 @@ export function InfoTab({
                         </label>
                         <Textarea
                             value={(formData.notes as string) || ""}
-                            onChange={(e: any) =>
+                            onChange={(e) =>
                                 setFormData({
                                     ...formData,
                                     notes: e.target.value,

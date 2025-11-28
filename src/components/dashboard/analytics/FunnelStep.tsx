@@ -10,6 +10,10 @@ type Props = {
     color: string;
 };
 
+interface CustomCSSProperties extends React.CSSProperties {
+    "--progress-color"?: string;
+}
+
 export default function FunnelStep({ label, value, progress, color }: Props) {
     return (
         <div>
@@ -24,7 +28,11 @@ export default function FunnelStep({ label, value, progress, color }: Props) {
             <Progress
                 value={progress}
                 className="h-3"
-                style={{ ["--progress-color" as any]: color } as any}
+                style={
+                    {
+                        "--progress-color": color,
+                    } as CustomCSSProperties
+                }
             />
         </div>
     );

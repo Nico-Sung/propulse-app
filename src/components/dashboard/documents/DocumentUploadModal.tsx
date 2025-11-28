@@ -72,6 +72,7 @@ export function DocumentUploadModal({
                 data: { publicUrl },
             } = supabase.storage.from("documents").getPublicUrl(filePath);
 
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const { error: dbError } = await (supabase as any)
                 .from("documents")
                 .insert({
@@ -80,14 +81,14 @@ export function DocumentUploadModal({
                     file_url: publicUrl,
                     document_type: type,
                     version_number: 1,
-                    application_id: defaultApplicationId || null, 
+                    application_id: defaultApplicationId || null,
                     created_at: new Date().toISOString(),
                 });
 
             if (dbError) throw dbError;
 
-            
             if (defaultApplicationId) {
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 await (supabase as any).from("activity_history").insert({
                     application_id: defaultApplicationId,
                     activity_type: "document_added",
@@ -102,9 +103,13 @@ export function DocumentUploadModal({
             setFile(null);
             setName("");
             onUploadComplete();
-        } catch (error: any) {
+        } catch (error) {
             console.error(error);
-            toast.error("Erreur lors de l'upload: " + error.message);
+            if (error instanceof Error) {
+                toast.error("Erreur lors de l'upload: " + error.message);
+            } else {
+                toast.error("Une erreur inconnue est survenue");
+            }
         } finally {
             setLoading(false);
         }
@@ -132,7 +137,9 @@ export function DocumentUploadModal({
                         <Label>Type de document</Label>
                         <Select
                             value={type}
-                            onValueChange={(v: any) => setType(v)}
+                            onValueChange={(v) =>
+                                setType(v as "cv" | "cover_letter")
+                            }
                         >
                             <SelectTrigger>
                                 <SelectValue />

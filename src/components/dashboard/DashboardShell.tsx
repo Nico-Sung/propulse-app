@@ -7,13 +7,17 @@ import DailyActionsView from "../views/DailyActionsView";
 import CalendarView from "../views/CalendarView";
 import AnalyticsView from "../views/AnalyticsView";
 import DocumentsView from "../views/DocumentView";
+import { Database } from "@/lib/database.types";
+import { DailyAction } from "./daily-actions/DailyActions";
+
+type Application = Database["public"]["Tables"]["applications"]["Row"];
 
 export default function DashboardShell({
     initialApplications,
     initialActions,
 }: {
-    initialApplications?: any[];
-    initialActions?: any[];
+    initialApplications?: Application[];
+    initialActions?: DailyAction[];
 }) {
     const { tab } = useDashboardTab();
 

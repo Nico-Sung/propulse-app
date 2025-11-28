@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import { Database } from "@/lib/database.types";
 import { Button } from "@/components/ui/button";
@@ -22,7 +22,10 @@ interface ActivityHistorySectionProps {
     applicationId: string;
 }
 
-const activityConfig: Record<string, { Icon: any; className: string }> = {
+const activityConfig: Record<
+    string,
+    { Icon: React.ElementType; className: string }
+> = {
     status_change: { Icon: Clock, className: "bg-primary/10 text-primary" },
     note: { Icon: FileText, className: "bg-surface text-muted-foreground" },
     task_completed: {
@@ -46,12 +49,9 @@ export function HistoryTab({ applicationId }: ActivityHistorySectionProps) {
     const [loading, setLoading] = useState(false);
     const [isAddingNote, setIsAddingNote] = useState(false);
 
-    useEffect(() => {
-        if (applicationId) loadActivities();
-    }, [applicationId]);
-
-    const loadActivities = async () => {
+    const loadActivities = useCallback(async () => {
         setLoading(true);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const { data } = await (supabase as any)
             .from("activity_history")
             .select("*")
@@ -59,11 +59,16 @@ export function HistoryTab({ applicationId }: ActivityHistorySectionProps) {
             .order("created_at", { ascending: false });
         if (data) setActivities(data as Activity[]);
         setLoading(false);
-    };
+    }, [applicationId]);
+
+    useEffect(() => {
+        if (applicationId) loadActivities();
+    }, [applicationId, loadActivities]);
 
     const addNote = async () => {
         if (!newNote.trim()) return;
         setIsAddingNote(true);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const { error } = await (supabase as any)
             .from("activity_history")
             .insert({
@@ -102,7 +107,7 @@ export function HistoryTab({ applicationId }: ActivityHistorySectionProps) {
             <div className="space-y-4">
                 {loading && (
                     <p className="text-center text-muted-foreground">
-                        Chargement de l'historique...
+                        Chargement de l&apos;historique...
                     </p>
                 )}
                 {!loading && activities.length === 0 && (

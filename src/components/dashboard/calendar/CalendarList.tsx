@@ -12,11 +12,7 @@ export default function CalendarList({
     return (
         <div className="space-y-8">
             {Object.entries(grouped).map(([dateKey, dateEvents]) => (
-                <CalendarDay
-                    key={dateKey}
-                    dateKey={dateKey}
-                    events={dateEvents}
-                />
+                <CalendarDay key={dateKey} events={dateEvents} />
             ))}
         </div>
     );

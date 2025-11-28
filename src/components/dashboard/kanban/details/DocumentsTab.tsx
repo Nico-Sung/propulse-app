@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import { Database } from "@/lib/database.types";
 
@@ -25,25 +25,20 @@ export function DocumentsTab({ applicationId }: { applicationId: string }) {
     const [linkedDocs, setLinkedDocs] = useState<Document[]>([]);
     const [availableDocs, setAvailableDocs] = useState<Document[]>([]);
     const [selectedDocId, setSelectedDocId] = useState<string>("");
-    const [loading, setLoading] = useState(true);
     const [previewDoc, setPreviewDoc] = useState<Document | null>(null);
 
     const [unlinkDoc, setUnlinkDoc] = useState<Document | null>(null);
     const [deleteDoc, setDeleteDoc] = useState<Document | null>(null);
 
-    useEffect(() => {
-        loadData();
-    }, [applicationId]);
-
-    const loadData = async () => {
-        setLoading(true);
-
+    const loadData = useCallback(async () => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const { data: linked } = await (supabase as any)
             .from("documents")
             .select("*")
             .eq("application_id", applicationId)
             .order("created_at", { ascending: false });
 
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const { data: available } = await (supabase as any)
             .from("documents")
             .select("*")
@@ -52,12 +47,16 @@ export function DocumentsTab({ applicationId }: { applicationId: string }) {
 
         if (linked) setLinkedDocs(linked as Document[]);
         if (available) setAvailableDocs(available as Document[]);
-        setLoading(false);
-    };
+    }, [applicationId]);
+
+    useEffect(() => {
+        loadData();
+    }, [loadData]);
 
     const linkDocument = async () => {
         if (!selectedDocId) return;
 
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const { error } = await (supabase as any)
             .from("documents")
             .update({ application_id: applicationId })
@@ -75,6 +74,7 @@ export function DocumentsTab({ applicationId }: { applicationId: string }) {
     const handleUnlink = async () => {
         if (!unlinkDoc) return;
 
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const { error } = await (supabase as any)
             .from("documents")
             .update({ application_id: null })
@@ -92,6 +92,7 @@ export function DocumentsTab({ applicationId }: { applicationId: string }) {
     const handleDelete = async () => {
         if (!deleteDoc) return;
 
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const { error } = await (supabase as any)
             .from("documents")
             .delete()

@@ -99,6 +99,7 @@ export function ApplicationCard({
     const [showDialog, setShowDialog] = useState(false);
 
     const handleDelete = async () => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const { error } = await (supabase as any)
             .from("applications")
             .delete()
@@ -112,7 +113,9 @@ export function ApplicationCard({
     };
 
     const handleDuplicate = async () => {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const { id, created_at, updated_at, ...rest } = application;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const { error } = await (supabase as any).from("applications").insert({
             ...rest,
             position_title: `${rest.position_title} (Copie)`,
@@ -130,6 +133,7 @@ export function ApplicationCard({
     const handleMove = async (status: string) => {
         if (status === application.status) return;
 
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const { error } = await (supabase as any)
             .from("applications")
             .update({
@@ -239,7 +243,6 @@ export function ApplicationCard({
                                 </div>
 
                                 {!compact && (
-                                    
                                     <div className="opacity-0 group-hover:opacity-100 transition-opacity -mr-2 -mt-2">
                                         <DropdownMenu>
                                             <DropdownMenuTrigger asChild>
@@ -249,7 +252,7 @@ export function ApplicationCard({
                                                     className="h-6 w-6 text-muted-foreground hover:text-foreground"
                                                     onClick={(e) =>
                                                         e.stopPropagation()
-                                                    } 
+                                                    }
                                                 >
                                                     <MoreHorizontal className="h-4 w-4" />
                                                 </Button>

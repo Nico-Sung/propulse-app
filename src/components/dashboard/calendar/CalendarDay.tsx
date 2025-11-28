@@ -13,13 +13,7 @@ export interface CalendarEvent {
     application: Application;
 }
 
-export default function CalendarDay({
-    dateKey,
-    events,
-}: {
-    dateKey: string;
-    events: CalendarEvent[];
-}) {
+export default function CalendarDay({ events }: { events: CalendarEvent[] }) {
     const date = events[0].date;
     const today = date.toDateString() === new Date().toDateString();
     const past = (() => {

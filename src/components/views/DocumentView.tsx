@@ -28,6 +28,7 @@ export default function DocumentsView() {
 
     const loadDocuments = async () => {
         setLoading(true);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const { data } = await (supabase as any)
             .from("documents")
             .select("*")
@@ -40,6 +41,7 @@ export default function DocumentsView() {
     const handleDelete = async () => {
         if (!deleteDoc) return;
 
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const { error } = await (supabase as any)
             .from("documents")
             .delete()
@@ -79,7 +81,7 @@ export default function DocumentsView() {
                         <FileText className="w-8 h-8 text-muted-foreground" />
                     </div>
                     <h3 className="text-lg font-semibold text-foreground">
-                        C'est un peu vide ici
+                        C&apos;est un peu vide ici
                     </h3>
                     <p className="text-muted-foreground max-w-sm mx-auto mt-2 mb-6">
                         Ajoutez votre premier CV pour commencer.

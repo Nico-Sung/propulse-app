@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import { useAuth } from "@/contexts/AuthContext";
 import { Database } from "@/lib/database.types";
@@ -132,6 +132,7 @@ export default function KanbanBoard({
             return [moved, ...without];
         });
 
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const { error } = await (supabase as any)
             .from("applications")
             .update({
@@ -147,6 +148,7 @@ export default function KanbanBoard({
             .eq("id", activeId);
 
         if (!error) {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             await (supabase as any).from("activity_history").insert({
                 application_id: activeId,
                 activity_type: "status_change",

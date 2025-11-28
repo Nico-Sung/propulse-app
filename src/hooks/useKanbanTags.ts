@@ -5,8 +5,8 @@ import { supabase } from "@/lib/supabaseClient";
 import { Database } from "@/lib/database.types";
 import { toast } from "sonner";
 
-
 export type Tag = Database["public"]["Tables"]["tags"]["Row"];
+type ApplicationTag = Database["public"]["Tables"]["application_tags"]["Row"];
 
 export const TAG_COLORS = [
     { name: "Rouge", value: "bg-red-500" },
@@ -27,10 +27,8 @@ export function useKanbanTags() {
     );
     const [loading, setLoading] = useState(true);
 
-    
     const load = async () => {
         try {
-            
             const { data: tagsData, error: tagsError } = await supabase
                 .from("tags")
                 .select("*")
@@ -38,19 +36,17 @@ export function useKanbanTags() {
 
             if (tagsError) throw tagsError;
 
-            
             const { data: assignData, error: assignError } = await supabase
                 .from("application_tags")
                 .select("*");
 
             if (assignError) throw assignError;
 
-            
             if (tagsData) setAllTags(tagsData);
 
             if (assignData) {
                 const newAssignments: Record<string, string[]> = {};
-                assignData.forEach((item) => {
+                (assignData as ApplicationTag[]).forEach((item) => {
                     if (!newAssignments[item.application_id]) {
                         newAssignments[item.application_id] = [];
                     }
@@ -93,7 +89,8 @@ export function useKanbanTags() {
         } = await supabase.auth.getUser();
         if (!user) return;
 
-        const { error } = await supabase.from("tags").insert({
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const { error } = await (supabase as any).from("tags").insert({
             user_id: user.id,
             label,
             color,
@@ -109,7 +106,11 @@ export function useKanbanTags() {
     };
 
     const deleteTag = async (tagId: string) => {
-        const { error } = await supabase.from("tags").delete().eq("id", tagId);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const { error } = await (supabase as any)
+            .from("tags")
+            .delete()
+            .eq("id", tagId);
 
         if (error) {
             toast.error("Impossible de supprimer l'étiquette");
@@ -128,7 +129,6 @@ export function useKanbanTags() {
         const currentTags = assignments[appId] || [];
         const isAssigned = currentTags.includes(tagId);
 
-        
         let newAppTags;
         if (isAssigned) {
             newAppTags = currentTags.filter((id) => id !== tagId);
@@ -138,8 +138,8 @@ export function useKanbanTags() {
         setAssignments({ ...assignments, [appId]: newAppTags });
 
         if (isAssigned) {
-            
-            const { error } = await supabase
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const { error } = await (supabase as any)
                 .from("application_tags")
                 .delete()
                 .eq("application_id", appId)
@@ -148,12 +148,12 @@ export function useKanbanTags() {
             if (error) {
                 console.error(error);
                 toast.error("Erreur lors du retrait");
-                
+
                 load();
             }
         } else {
-            
-            const { error } = await supabase
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const { error } = await (supabase as any)
                 .from("application_tags")
                 .insert({ application_id: appId, tag_id: tagId });
 

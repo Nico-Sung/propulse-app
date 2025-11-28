@@ -1,6 +1,6 @@
 "use client";
 
-import { UniqueIdentifier, useDroppable } from "@dnd-kit/core";
+import { useDroppable } from "@dnd-kit/core";
 import { cn } from "@/lib/utils";
 import {
     ContextMenu,
@@ -31,11 +31,9 @@ import {
     PlusCircle,
     RotateCw,
     SortAsc,
-    Trash2,
     Palette,
     MoreHorizontal,
 } from "lucide-react";
-import { toast } from "sonner";
 import { useMemo } from "react";
 import { Database } from "@/lib/database.types";
 import { ApplicationCard } from "./ApplicationCard";
@@ -183,7 +181,7 @@ export function KanbanColumn({
                                     }
                                     className="rounded-md focus:bg-primary/10 focus:text-primary"
                                 >
-                                    Date d'ajout (Récent)
+                                    Date d&apos;ajout (Récent)
                                 </DropdownMenuCheckboxItem>
                                 <DropdownMenuCheckboxItem
                                     checked={sortOption === "date_asc"}
@@ -192,7 +190,7 @@ export function KanbanColumn({
                                     }
                                     className="rounded-md focus:bg-primary/10 focus:text-primary"
                                 >
-                                    Date d'ajout (Ancien)
+                                    Date d&apos;ajout (Ancien)
                                 </DropdownMenuCheckboxItem>
                                 <DropdownMenuCheckboxItem
                                     checked={sortOption === "name_asc"}
@@ -313,7 +311,12 @@ function ContextMenuMenuItemGroup({
     onSortChange,
     viewMode,
     onViewModeChange,
-}: any) {
+}: {
+    sortOption: SortOption;
+    onSortChange: (option: SortOption) => void;
+    viewMode: ViewMode;
+    onViewModeChange: (mode: ViewMode) => void;
+}) {
     return (
         <>
             <ContextMenuSub>
@@ -327,14 +330,14 @@ function ContextMenuMenuItemGroup({
                         onCheckedChange={() => onSortChange("date_desc")}
                         className="rounded-md focus:bg-primary/10 focus:text-primary"
                     >
-                        Date d'ajout (Récent)
+                        Date d&apos;ajout (Récent)
                     </ContextMenuCheckboxItem>
                     <ContextMenuCheckboxItem
                         checked={sortOption === "date_asc"}
                         onCheckedChange={() => onSortChange("date_asc")}
                         className="rounded-md focus:bg-primary/10 focus:text-primary"
                     >
-                        Date d'ajout (Ancien)
+                        Date d&apos;ajout (Ancien)
                     </ContextMenuCheckboxItem>
                     <ContextMenuCheckboxItem
                         checked={sortOption === "name_asc"}

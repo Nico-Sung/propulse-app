@@ -1,12 +1,14 @@
 "use client";
 
 import React from "react";
-import DailyActions from "../dashboard/daily-actions/DailyActions";
+import DailyActions, {
+    DailyAction,
+} from "../dashboard/daily-actions/DailyActions";
 
 export default function DailyActionsView({
     initialActions,
 }: {
-    initialActions?: any[];
+    initialActions?: DailyAction[];
 }) {
     return (
         <div className="w-full min-h-screen">

@@ -69,12 +69,15 @@ export default function AddApplicationForm({
             positionTitle: "",
             jobUrl: "",
             contractType: "",
-            status: defaultStatus as any,
+            status: defaultStatus as ApplicationFormValues["status"],
         },
     });
 
     useEffect(() => {
-        form.setValue("status", defaultStatus as any);
+        form.setValue(
+            "status",
+            defaultStatus as ApplicationFormValues["status"]
+        );
     }, [defaultStatus, form]);
 
     async function onSubmit(values: ApplicationFormValues) {
@@ -107,7 +110,9 @@ export default function AddApplicationForm({
                 company_name: values.companyName,
                 position_title: values.positionTitle,
                 job_description: values.jobDescription ?? "",
-                status: (values.status as any) ?? defaultStatus,
+                status:
+                    values.status ??
+                    (defaultStatus as ApplicationFormValues["status"]),
                 application_date: values.applicationDate ?? null,
                 last_contact_date: values.lastContactDate ?? null,
                 notes: values.notes ?? "",
@@ -120,6 +125,7 @@ export default function AddApplicationForm({
                 updated_at: new Date().toISOString(),
             };
 
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const { data, error } = await (supabase as any)
                 .from("applications")
                 .insert([insertObj])
@@ -140,6 +146,7 @@ export default function AddApplicationForm({
                 ];
 
                 if (data?.id) {
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
                     const { error: tasksError } = await (supabase as any)
                         .from("tasks")
                         .insert(
@@ -170,9 +177,13 @@ export default function AddApplicationForm({
             setOpen(false);
             window.location.reload();
             form.reset();
-        } catch (err: any) {
+        } catch (err: unknown) {
             console.error(err);
-            toast.error(err?.message || "Une erreur est survenue.");
+            if (err instanceof Error) {
+                toast.error(err.message);
+            } else {
+                toast.error("Une erreur est survenue.");
+            }
         }
     }
 
@@ -220,7 +231,7 @@ export default function AddApplicationForm({
                         name="jobUrl"
                         render={({ field }) => (
                             <FormItem>
-                                <FormLabel>URL de l'offre</FormLabel>
+                                <FormLabel>URL de l&apos;offre</FormLabel>
                                 <FormControl>
                                     <Input
                                         placeholder="https://..."
@@ -333,7 +344,7 @@ export default function AddApplicationForm({
                     name="interviewDate"
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel>Date d'entretien</FormLabel>
+                            <FormLabel>Date d&apos;entretien</FormLabel>
                             <FormControl>
                                 <Input
                                     type="date"

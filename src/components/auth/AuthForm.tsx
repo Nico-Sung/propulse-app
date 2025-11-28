@@ -29,8 +29,12 @@ export default function AuthForm({ initialSignUp = false }: Props) {
                 ? await signUp(email, password, fullName)
                 : await signIn(email, password);
             if (error) throw error;
-        } catch (err: any) {
-            setError(err.message || "Une erreur est survenue");
+        } catch (err) {
+            if (err instanceof Error) {
+                setError(err.message);
+            } else {
+                setError("Une erreur inconnue est survenue");
+            }
         } finally {
             setLoading(false);
         }

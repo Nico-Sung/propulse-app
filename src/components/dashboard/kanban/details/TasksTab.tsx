@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import { Database } from "@/lib/database.types";
 import { Button } from "@/components/ui/button";
@@ -14,12 +14,9 @@ export function TasksTab({ applicationId }: { applicationId: string }) {
     const [newTaskTitle, setNewTaskTitle] = useState("");
     const [loading, setLoading] = useState(false);
 
-    useEffect(() => {
-        if (applicationId) loadTasks();
-    }, [applicationId]);
-
-    const loadTasks = async () => {
+    const loadTasks = useCallback(async () => {
         setLoading(true);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const { data } = await (supabase as any)
             .from("tasks")
             .select("*")
@@ -27,10 +24,15 @@ export function TasksTab({ applicationId }: { applicationId: string }) {
             .order("created_at", { ascending: true });
         if (data) setTasks(data as Task[]);
         setLoading(false);
-    };
+    }, [applicationId]);
+
+    useEffect(() => {
+        if (applicationId) loadTasks();
+    }, [applicationId, loadTasks]);
 
     const addTask = async () => {
         if (!newTaskTitle.trim()) return;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const { error } = await (supabase as any).from("tasks").insert({
             application_id: applicationId,
             title: newTaskTitle.trim(),
@@ -43,6 +45,7 @@ export function TasksTab({ applicationId }: { applicationId: string }) {
     };
 
     const toggleTask = async (task: Task) => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const { error } = await (supabase as any)
             .from("tasks")
             .update({ is_completed: !task.is_completed })
@@ -52,6 +55,7 @@ export function TasksTab({ applicationId }: { applicationId: string }) {
 
     const deleteTask = async (taskId: string) => {
         if (!confirm("Supprimer cette tâche ?")) return;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const { error } = await (supabase as any)
             .from("tasks")
             .delete()

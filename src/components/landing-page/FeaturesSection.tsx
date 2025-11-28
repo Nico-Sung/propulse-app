@@ -9,8 +9,8 @@ export default function FeaturesSection() {
                     Passez au niveau supérieur
                 </h2>
                 <p className="text-lg text-gray-600 mt-2">
-                    Tout ce dont vous avez besoin pour une recherche d'emploi
-                    organisée et efficace.
+                    Tout ce dont vous avez besoin pour une recherche
+                    d&apos;emploi organisée et efficace.
                 </p>
             </div>
             <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">

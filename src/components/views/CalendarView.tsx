@@ -1,9 +1,8 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import { useAuth } from "@/contexts/AuthContext";
-import { Calendar as CalendarIcon } from "lucide-react";
 import {
     Application,
     CalendarEvent,
@@ -11,37 +10,10 @@ import {
 import CalendarList from "../dashboard/calendar/CalendarList";
 
 export default function CalendarView() {
-    const [applications, setApplications] = useState<Application[]>([]);
     const [events, setEvents] = useState<CalendarEvent[]>([]);
-    const [loading, setLoading] = useState(true);
     const { user } = useAuth();
 
-    useEffect(() => {
-        if (user) loadApplications();
-        else {
-            setApplications([]);
-            setEvents([]);
-            setLoading(false);
-        }
-        
-    }, [user]);
-
-    const loadApplications = async () => {
-        setLoading(true);
-        const { data, error } = await supabase
-            .from("applications")
-            .select("*")
-            .order("created_at", { ascending: false });
-
-        if (!error && data) {
-            const apps = data as Application[];
-            setApplications(apps);
-            processEvents(apps);
-        }
-        setLoading(false);
-    };
-
-    const processEvents = (apps: Application[]) => {
+    const processEvents = useCallback((apps: Application[]) => {
         const eventList: CalendarEvent[] = [];
 
         apps.forEach((app) => {
@@ -65,7 +37,28 @@ export default function CalendarView() {
 
         eventList.sort((a, b) => a.date.getTime() - b.date.getTime());
         setEvents(eventList);
-    };
+    }, []);
+
+    const loadApplications = useCallback(async () => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const { data, error } = await (supabase as any)
+            .from("applications")
+            .select("*")
+            .order("created_at", { ascending: false });
+
+        if (!error && data) {
+            const apps = data as Application[];
+            processEvents(apps);
+        }
+    }, [processEvents]);
+
+    useEffect(() => {
+        if (user) {
+            loadApplications();
+        } else {
+            setEvents([]);
+        }
+    }, [user, loadApplications]);
 
     const groupEventsByDate = () => {
         const grouped: Record<string, CalendarEvent[]> = {};

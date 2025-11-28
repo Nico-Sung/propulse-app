@@ -54,7 +54,7 @@ export function DocumentPreviewModal({
                                 rel="noopener noreferrer"
                             >
                                 <ExternalLink className="w-4 h-4 mr-2" />
-                                Ouvrir l'original
+                                Ouvrir l&apos;original
                             </a>
                         </Button>
                         <Button
@@ -72,7 +72,9 @@ export function DocumentPreviewModal({
                             size="icon"
                             className="h-8 w-8 text-muted-foreground hover:text-foreground hover:bg-black/5 dark:hover:bg-white/10 ml-2 rounded-full"
                             onClick={() => onOpenChange(false)}
-                        ></Button>
+                        >
+                            <X className="w-4 h-4" />
+                        </Button>
                     </div>
                 </DialogHeader>
 

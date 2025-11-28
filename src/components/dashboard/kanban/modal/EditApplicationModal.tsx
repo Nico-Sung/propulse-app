@@ -13,7 +13,6 @@ import {
     DialogContent,
     DialogHeader,
     DialogTitle,
-    DialogFooter,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { DialogDescription } from "@radix-ui/react-dialog";
@@ -35,9 +34,9 @@ export function EditApplicationSheet({
     onClose,
     onUpdate,
 }: Props) {
-    if (!application || !isOpen) return null;
-
     const [activeTab, setActiveTab] = useState<Tab>("info");
+
+    if (!application || !isOpen) return null;
 
     const tabs = [
         { id: "info" as Tab, label: "Infos", icon: FileText },

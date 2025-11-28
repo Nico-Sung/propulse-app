@@ -30,7 +30,6 @@ import Spinner from "@/components/ui/Spinner";
 import ThemeToggle from "@/components/design-system/theme-toggle";
 import Image from "next/image";
 
-// Define local type since it is not exported from context
 type TabValue =
     | "dashboard"
     | "actions"

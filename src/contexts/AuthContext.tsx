@@ -12,7 +12,9 @@ interface AuthContextType {
         email: string,
         password: string,
         fullName: string
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
     ) => Promise<{ error: any }>;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     signIn: (email: string, password: string) => Promise<{ error: any }>;
     signOut: () => Promise<void>;
 }
@@ -54,6 +56,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 created_at: now,
                 updated_at: now,
             };
+
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const { error: profileError } = await (supabase as any)
                 .from("profiles")
                 .upsert([profile], { onConflict: "id" });
