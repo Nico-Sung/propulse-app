@@ -551,8 +551,8 @@ export function ApplicationCard({
 
                                     {application.salary_range && (
                                         <Badge
-                                            variant="outline"
-                                            className="text-[10px] px-1.5 h-5 border-border/50 text-muted-foreground font-normal bg-white/50 backdrop-blur-sm"
+                                            variant="secondary"
+                                            className="text-[10px] px-1.5 h-5 border-border/50 font-normal bg-secondary backdrop-blur-sm"
                                         >
                                             {application.salary_range}
                                         </Badge>
