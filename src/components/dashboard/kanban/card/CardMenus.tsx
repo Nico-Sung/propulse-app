@@ -17,7 +17,7 @@ import {
     X,
 } from "lucide-react";
 import { useState } from "react";
-import { COLUMN_LABELS } from "./useApplicationActions";
+import { COLUMN_LABELS } from "../../../../hooks/useApplicationActions";
 
 // Imports UI Radix
 import {

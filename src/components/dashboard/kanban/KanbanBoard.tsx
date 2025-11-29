@@ -1,26 +1,27 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { supabase } from "@/lib/supabaseClient";
+import { OverlayCard } from "@/components/design-system/overlay-card";
+import Spinner from "@/components/ui/Spinner";
 import { useAuth } from "@/contexts/AuthContext";
+import { useKanbanTags } from "@/hooks/useKanbanTags";
+import { useSettings } from "@/hooks/useSettings";
 import { Database } from "@/lib/database.types";
-import { EditApplicationSheet } from "./modal/EditApplicationModal";
-import { AddApplicationDialog } from "./modal/AddApplicationModal";
+import { supabase } from "@/lib/supabaseClient";
 import {
+    closestCenter,
     DndContext,
     DragEndEvent,
-    DragStartEvent,
     DragOverlay,
+    DragStartEvent,
     PointerSensor,
+    UniqueIdentifier,
     useSensor,
     useSensors,
-    closestCenter,
-    UniqueIdentifier,
 } from "@dnd-kit/core";
-import { KanbanColumn, SortOption, ViewMode } from "./KanbanColumn";
-import Spinner from "@/components/ui/Spinner";
-import { OverlayCard } from "@/components/design-system/overlay-card";
-import { useKanbanTags } from "@/hooks/useKanbanTags";
+import { useEffect, useState } from "react";
+import { KanbanColumn, SortOption } from "./KanbanColumn";
+import { AddApplicationDialog } from "./modal/AddApplicationModal";
+import { EditApplicationSheet } from "./modal/EditApplicationModal";
 
 type Application = Database["public"]["Tables"]["applications"]["Row"];
 
@@ -45,25 +46,18 @@ export default function KanbanBoard({
     const { user } = useAuth();
 
     const tagsData = useKanbanTags();
+    const { viewMode, setViewMode } = useSettings();
 
     const [sortOption, setSortOption] = useState<SortOption>("date_desc");
-    const [viewMode, setViewMode] = useState<ViewMode>("normal");
 
     useEffect(() => {
         const savedSort = localStorage.getItem("kanban_sort");
-        const savedView = localStorage.getItem("kanban_view");
         if (savedSort) setSortOption(savedSort as SortOption);
-        if (savedView) setViewMode(savedView as ViewMode);
     }, []);
 
     const handleSortChange = (option: SortOption) => {
         setSortOption(option);
         localStorage.setItem("kanban_sort", option);
-    };
-
-    const handleViewChange = (mode: ViewMode) => {
-        setViewMode(mode);
-        localStorage.setItem("kanban_view", mode);
     };
 
     const sensors = useSensors(
@@ -198,7 +192,7 @@ export default function KanbanBoard({
                                     sortOption={sortOption}
                                     onSortChange={handleSortChange}
                                     viewMode={viewMode}
-                                    onViewModeChange={handleViewChange}
+                                    onViewModeChange={setViewMode}
                                     onCardClick={(app) => {
                                         setSelectedApplication(app);
                                         setIsSheetOpen(true);

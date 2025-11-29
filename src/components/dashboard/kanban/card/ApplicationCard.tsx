@@ -9,9 +9,9 @@ import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { useState } from "react";
 
+import { useApplicationActions } from "../../../../hooks/useApplicationActions";
 import { CardContextMenuContentWrapper, CardDropdownMenu } from "./CardMenus";
 import { CardFooter, CardHeader, CardMainInfo, CardTags } from "./CardVisuals";
-import { useApplicationActions } from "./useApplicationActions";
 
 type Application = Database["public"]["Tables"]["applications"]["Row"];
 
