@@ -39,7 +39,7 @@ import {
     SortAsc,
 } from "lucide-react";
 import { useMemo } from "react";
-import { ApplicationCard } from "./ApplicationCard";
+import { ApplicationCard } from "./card/ApplicationCard";
 
 type Application = Database["public"]["Tables"]["applications"]["Row"];
 
