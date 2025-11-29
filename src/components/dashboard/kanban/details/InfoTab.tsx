@@ -329,7 +329,7 @@ export function InfoTab({
                                     job_url: e.target.value,
                                 })
                             }
-                            placeholder="https://"
+                            placeholder="https://..."
                         />
                     </div>
 

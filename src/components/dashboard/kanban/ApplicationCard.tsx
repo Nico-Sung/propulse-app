@@ -1,57 +1,57 @@
 "use client";
 
-import { useSortable } from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
+import ConfirmationDialog from "@/components/design-system/confirm-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import {
-    Trash2,
-    CalendarClock,
-    Building2,
-    Edit,
-    ExternalLink,
-    Copy,
-    ArrowRight,
-    Tag as TagIcon,
-    MoreHorizontal,
-    Plus,
-    Check,
-    X,
-} from "lucide-react";
-import { Database } from "@/lib/database.types";
-import { supabase } from "@/lib/supabaseClient";
-import ConfirmationDialog from "@/components/design-system/confirm-dialog";
-import { useState } from "react";
-import { cn } from "@/lib/utils";
-import { toast } from "sonner";
-import { useKanbanTags, TAG_COLORS } from "@/hooks/useKanbanTags";
 import {
     ContextMenu,
     ContextMenuContent,
     ContextMenuItem,
-    ContextMenuTrigger,
-    ContextMenuSeparator,
-    ContextMenuSub,
-    ContextMenuSubTrigger,
-    ContextMenuSubContent,
+    ContextMenuLabel,
     ContextMenuRadioGroup,
     ContextMenuRadioItem,
-    ContextMenuLabel,
+    ContextMenuSeparator,
+    ContextMenuSub,
+    ContextMenuSubContent,
+    ContextMenuSubTrigger,
+    ContextMenuTrigger,
 } from "@/components/ui/context-menu";
 import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
-    DropdownMenuTrigger,
-    DropdownMenuSeparator,
     DropdownMenuLabel,
-    DropdownMenuSub,
-    DropdownMenuSubTrigger,
-    DropdownMenuSubContent,
     DropdownMenuRadioGroup,
     DropdownMenuRadioItem,
+    DropdownMenuSeparator,
+    DropdownMenuSub,
+    DropdownMenuSubContent,
+    DropdownMenuSubTrigger,
+    DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Input } from "@/components/ui/input";
+import { TAG_COLORS, useKanbanTags } from "@/hooks/useKanbanTags";
+import { Database } from "@/lib/database.types";
+import { supabase } from "@/lib/supabaseClient";
+import { cn } from "@/lib/utils";
+import { useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+import {
+    ArrowRight,
+    Building2,
+    CalendarClock,
+    Check,
+    Copy,
+    Edit,
+    ExternalLink,
+    MoreHorizontal,
+    Plus,
+    Tag as TagIcon,
+    Trash2,
+    X,
+} from "lucide-react";
+import { useState } from "react";
+import { toast } from "sonner";
 
 type Application = Database["public"]["Tables"]["applications"]["Row"];
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -116,8 +116,6 @@ export function ApplicationCard({
     };
 
     const handleDuplicate = async () => {
-        
-        
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const { error } = await (supabase as any).from("applications").insert({
             user_id: application.user_id,
@@ -567,7 +565,7 @@ export function ApplicationCard({
                                     {application.salary_range && (
                                         <Badge
                                             variant="outline"
-                                            className="text-[10px] px-1.5 h-5 border-border/50 text-muted-foreground font-normal bg-white/50 backdrop-blur-sm"
+                                            className="text-[10px] px-1.5 h-5 border-border/50 text-muted-foreground font-normal bg-secondary backdrop-blur-sm"
                                         >
                                             {application.salary_range}
                                         </Badge>

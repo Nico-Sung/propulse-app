@@ -1,5 +1,6 @@
 "use client";
 
+import { SettingsModal } from "@/components/dashboard/settings/SettingsModal";
 import ThemeToggle from "@/components/design-system/theme-toggle";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -13,7 +14,6 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import Spinner from "@/components/ui/Spinner";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from "@/contexts/AuthContext";
 import {
     DashboardTabProvider,
@@ -28,12 +28,11 @@ import {
     LayoutDashboard,
     LogOut,
     Settings,
-    User,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 type TabValue =
     | "dashboard"
@@ -73,6 +72,8 @@ function ShellLayout({ children }: { children: React.ReactNode }) {
     const router = useRouter();
     const pathname = usePathname();
 
+    const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+
     useEffect(() => {
         const lastSegment = pathname.split("/").pop();
         const active = (lastSegment || "dashboard") as TabValue;
@@ -108,19 +109,19 @@ function ShellLayout({ children }: { children: React.ReactNode }) {
 
     return (
         <div className="flex flex-col min-h-screen bg-background selection:bg-primary/20 pb-20 md:pb-0">
-            <header className="hidden md:block sticky top-0 z-50 w-full border-b border-white/20 dark:border-white/10 bg-white/70 dark:bg-black/60 backdrop-blur-xl backdrop-saturate-150 shadow-sm transition-all duration-300">
-                <div className="max-w-[1800px] mx-auto px-4 h-16 flex items-center justify-between">
+            <header className="hidden md:block sticky top-0 z-50 w-full border-b border-white/10 dark:border-white/5 bg-white/60 dark:bg-black/40 backdrop-blur-xl backdrop-saturate-150 transition-all duration-300">
+                <div className="max-w-[1800px] mx-auto px-6 h-16 flex items-center justify-between">
                     <div className="flex items-center gap-3 min-w-fit">
                         <Link
                             href="/dashboard"
                             className="group flex items-center gap-2 transition-opacity hover:opacity-80"
                         >
-                            <div className="relative flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-purple-600 text-white shadow-lg shadow-primary/20">
+                            <div className="relative flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-purple-600 text-white shadow-lg shadow-primary/20">
                                 <Image
                                     src="/logo.png"
                                     alt="Logo"
-                                    width={20}
-                                    height={20}
+                                    width={18}
+                                    height={18}
                                     className="object-contain brightness-0 invert"
                                 />
                             </div>
@@ -131,33 +132,42 @@ function ShellLayout({ children }: { children: React.ReactNode }) {
                     </div>
 
                     <div className="flex-1 flex justify-center max-w-2xl mx-4">
-                        <Tabs
-                            value={pathname.includes("/settings") ? "" : tab}
-                            onValueChange={handleNavigate}
-                            className="w-full max-w-fit"
-                        >
-                            <TabsList className="bg-black/5 dark:bg-white/10 p-1 rounded-full border border-black/5 dark:border-white/5 h-10 shadow-inner">
-                                {menuItems.map((item) => (
-                                    <TabsTrigger
+                        <nav className="flex items-center p-1 bg-black/5 dark:bg-white/5 rounded-full backdrop-blur-md border border-white/10 dark:border-white/5 shadow-inner">
+                            {menuItems.map((item) => {
+                                const isActive = pathname.includes("/settings")
+                                    ? false
+                                    : tab === item.id;
+                                return (
+                                    <button
                                         key={item.id}
-                                        value={item.id}
+                                        onClick={() => handleNavigate(item.id)}
                                         className={cn(
-                                            "rounded-full px-4 py-1.5 text-xs font-medium transition-all duration-300",
-                                            "data-[state=active]:bg-white dark:data-[state=active]:bg-zinc-800 data-[state=active]:text-foreground data-[state=active]:shadow-sm",
-                                            "hover:bg-white/50 dark:hover:bg-white/10 hover:text-foreground",
-                                            "text-muted-foreground"
+                                            "relative px-4 py-1.5 rounded-full text-xs font-medium transition-all duration-300 flex items-center gap-2",
+                                            isActive
+                                                ? "text-foreground shadow-sm"
+                                                : "text-muted-foreground hover:text-foreground hover:bg-white/10 dark:hover:bg-white/5"
                                         )}
                                     >
-                                        <item.icon className="w-3.5 h-3.5 mr-2 opacity-70" />
+                                        {isActive && (
+                                            <div className="absolute inset-0 bg-white dark:bg-zinc-800 rounded-full shadow-sm -z-10 animate-in fade-in zoom-in-95 duration-200" />
+                                        )}
+                                        <item.icon
+                                            className={cn(
+                                                "w-3.5 h-3.5 transition-colors",
+                                                isActive
+                                                    ? "text-primary"
+                                                    : "text-muted-foreground group-hover:text-foreground"
+                                            )}
+                                        />
                                         {item.label}
-                                    </TabsTrigger>
-                                ))}
-                            </TabsList>
-                        </Tabs>
+                                    </button>
+                                );
+                            })}
+                        </nav>
                     </div>
 
                     <div className="flex items-center gap-3 min-w-fit">
-                        <ThemeToggle className="hover:bg-black/5 dark:hover:bg-white/10 rounded-full transition-colors" />
+                        <ThemeToggle className="hover:bg-black/5 dark:hover:bg-white/10 rounded-full transition-colors h-9 w-9" />
 
                         <div className="h-4 w-px bg-foreground/10 mx-1" />
 
@@ -199,28 +209,11 @@ function ShellLayout({ children }: { children: React.ReactNode }) {
 
                                 <DropdownMenuGroup>
                                     <DropdownMenuItem
-                                        asChild
                                         className="rounded-lg focus:bg-primary/10 focus:text-primary cursor-pointer"
+                                        onClick={() => setIsSettingsOpen(true)}
                                     >
-                                        <Link
-                                            href="/dashboard/settings"
-                                            className="w-full flex items-center"
-                                        >
-                                            <User className="mr-2 h-4 w-4" />
-                                            <span>Profil</span>
-                                        </Link>
-                                    </DropdownMenuItem>
-                                    <DropdownMenuItem
-                                        asChild
-                                        className="rounded-lg focus:bg-primary/10 focus:text-primary cursor-pointer"
-                                    >
-                                        <Link
-                                            href="/dashboard/settings"
-                                            className="w-full flex items-center"
-                                        >
-                                            <Settings className="mr-2 h-4 w-4" />
-                                            <span>Paramètres</span>
-                                        </Link>
+                                        <Settings className="mr-2 h-4 w-4" />
+                                        <span>Paramètres</span>
                                     </DropdownMenuItem>
                                 </DropdownMenuGroup>
 
@@ -239,9 +232,9 @@ function ShellLayout({ children }: { children: React.ReactNode }) {
                 </div>
             </header>
 
-            <header className="md:hidden sticky top-0 z-40 w-full border-b border-white/10 bg-white/80 dark:bg-black/70 backdrop-blur-lg p-4 flex items-center justify-between">
+            <header className="md:hidden sticky top-0 z-40 w-full border-b border-white/10 bg-white/80 dark:bg-black/70 backdrop-blur-lg p-4 flex items-center justify-between transition-all duration-300">
                 <Link href="/dashboard" className="flex items-center gap-2">
-                    <div className="relative flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-purple-600 text-white">
+                    <div className="relative flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-purple-600 text-white shadow-lg">
                         <Image
                             src="/logo.png"
                             alt="Logo"
@@ -255,19 +248,20 @@ function ShellLayout({ children }: { children: React.ReactNode }) {
                     </span>
                 </Link>
                 <div className="flex items-center gap-2">
-                    <ThemeToggle className="h-8 w-8 rounded-full" />
-                    <Link href="/dashboard/settings">
-                        <Avatar className="h-8 w-8 border-2 border-white/20">
+                    <ThemeToggle className="h-8 w-8 rounded-full bg-transparent hover:bg-black/5" />
+                    <button onClick={() => setIsSettingsOpen(true)}>
+                        {" "}
+                        <Avatar className="h-8 w-8 border-2 border-white/20 shadow-sm">
                             <AvatarImage src="" />
                             <AvatarFallback className="bg-gradient-to-br from-primary to-purple-500 text-white text-[10px]">
                                 {user?.email?.charAt(0).toUpperCase() || "U"}
                             </AvatarFallback>
                         </Avatar>
-                    </Link>
+                    </button>
                 </div>
             </header>
 
-            <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 border-t border-white/20 bg-white/85 dark:bg-black/85 backdrop-blur-xl pb-safe pt-1 px-2">
+            <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 border-t border-white/20 bg-white/85 dark:bg-black/85 backdrop-blur-xl pb-safe pt-1 px-2 shadow-[0_-1px_10px_rgba(0,0,0,0.05)]">
                 <nav className="flex justify-around items-center h-16">
                     {menuItems.map((item) => {
                         const isActive =
@@ -277,7 +271,7 @@ function ShellLayout({ children }: { children: React.ReactNode }) {
                                 key={item.id}
                                 onClick={() => handleNavigate(item.id)}
                                 className={cn(
-                                    "flex flex-col items-center justify-center w-full h-full gap-1 transition-all duration-200",
+                                    "flex flex-col items-center justify-center w-full h-full gap-1 transition-all duration-200 active:scale-95",
                                     isActive
                                         ? "text-primary"
                                         : "text-muted-foreground hover:text-foreground"
@@ -285,15 +279,15 @@ function ShellLayout({ children }: { children: React.ReactNode }) {
                             >
                                 <div
                                     className={cn(
-                                        "p-1.5 rounded-xl transition-all",
+                                        "p-1.5 rounded-xl transition-all duration-300",
                                         isActive
-                                            ? "bg-primary/10"
+                                            ? "bg-primary/10 scale-110"
                                             : "bg-transparent"
                                     )}
                                 >
                                     <item.icon
                                         className={cn(
-                                            "w-5 h-5",
+                                            "w-5 h-5 transition-all",
                                             isActive && "fill-current"
                                         )}
                                     />
@@ -310,6 +304,11 @@ function ShellLayout({ children }: { children: React.ReactNode }) {
             <main className="flex-1 w-full max-w-[1800px] mx-auto overflow-hidden relative z-0">
                 {children}
             </main>
+
+            <SettingsModal
+                open={isSettingsOpen}
+                onOpenChange={setIsSettingsOpen}
+            />
         </div>
     );
 }
