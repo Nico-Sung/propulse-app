@@ -1,26 +1,45 @@
 "use client";
 
-import { useDroppable } from "@dnd-kit/core";
-import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 import {
     ContextMenu,
+    ContextMenuCheckboxItem,
     ContextMenuContent,
     ContextMenuItem,
-    ContextMenuTrigger,
     ContextMenuLabel,
     ContextMenuSeparator,
     ContextMenuSub,
-    ContextMenuSubTrigger,
     ContextMenuSubContent,
-    ContextMenuCheckboxItem,
+    ContextMenuSubTrigger,
+    ContextMenuTrigger,
 } from "@/components/ui/context-menu";
-import { PlusCircle, RotateCw, SortAsc, Palette, Plus } from "lucide-react";
-import { useMemo } from "react";
-import { Database } from "@/lib/database.types";
-import { ApplicationCard } from "./ApplicationCard";
-import { SortableContext, rectSortingStrategy } from "@dnd-kit/sortable";
-import { Button } from "@/components/ui/button";
+import {
+    DropdownMenu,
+    DropdownMenuCheckboxItem,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuSub,
+    DropdownMenuSubContent,
+    DropdownMenuSubTrigger,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { useKanbanTags } from "@/hooks/useKanbanTags";
+import { Database } from "@/lib/database.types";
+import { cn } from "@/lib/utils";
+import { useDroppable } from "@dnd-kit/core";
+import { SortableContext, rectSortingStrategy } from "@dnd-kit/sortable";
+import {
+    MoreHorizontal,
+    Palette,
+    Plus,
+    PlusCircle,
+    RotateCw,
+    SortAsc,
+} from "lucide-react";
+import { useMemo } from "react";
+import { ApplicationCard } from "./ApplicationCard";
 
 type Application = Database["public"]["Tables"]["applications"]["Row"];
 
@@ -140,6 +159,94 @@ export function KanbanColumn({
                         {applications.length}
                     </span>
                 </div>
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-6 w-6 text-muted-foreground hover:text-foreground"
+                        >
+                            <MoreHorizontal className="h-4 w-4" />
+                        </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-56">
+                        <DropdownMenuLabel>
+                            Options de colonne
+                        </DropdownMenuLabel>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem onClick={onAddApplication}>
+                            <PlusCircle className="mr-2 h-4 w-4" />
+                            Ajouter une carte
+                        </DropdownMenuItem>
+
+                        <DropdownMenuSub>
+                            <DropdownMenuSubTrigger>
+                                <SortAsc className="mr-2 h-4 w-4" />
+                                Trier par...
+                            </DropdownMenuSubTrigger>
+                            <DropdownMenuSubContent>
+                                <DropdownMenuCheckboxItem
+                                    checked={sortOption === "date_desc"}
+                                    onCheckedChange={() =>
+                                        onSortChange("date_desc")
+                                    }
+                                >
+                                    Date d&apos;ajout (Récent)
+                                </DropdownMenuCheckboxItem>
+                                <DropdownMenuCheckboxItem
+                                    checked={sortOption === "date_asc"}
+                                    onCheckedChange={() =>
+                                        onSortChange("date_asc")
+                                    }
+                                >
+                                    Date d&apos;ajout (Ancien)
+                                </DropdownMenuCheckboxItem>
+                                <DropdownMenuCheckboxItem
+                                    checked={sortOption === "name_asc"}
+                                    onCheckedChange={() =>
+                                        onSortChange("name_asc")
+                                    }
+                                >
+                                    Nom (A-Z)
+                                </DropdownMenuCheckboxItem>
+                            </DropdownMenuSubContent>
+                        </DropdownMenuSub>
+
+                        <DropdownMenuSub>
+                            <DropdownMenuSubTrigger>
+                                <Palette className="mr-2 h-4 w-4" />
+                                Apparence
+                            </DropdownMenuSubTrigger>
+                            <DropdownMenuSubContent>
+                                <DropdownMenuCheckboxItem
+                                    checked={viewMode === "normal"}
+                                    onCheckedChange={() =>
+                                        onViewModeChange("normal")
+                                    }
+                                >
+                                    Mode Normal
+                                </DropdownMenuCheckboxItem>
+                                <DropdownMenuCheckboxItem
+                                    checked={viewMode === "compact"}
+                                    onCheckedChange={() =>
+                                        onViewModeChange("compact")
+                                    }
+                                >
+                                    Mode Compact
+                                </DropdownMenuCheckboxItem>
+                            </DropdownMenuSubContent>
+                        </DropdownMenuSub>
+
+                        <DropdownMenuSeparator />
+
+                        <DropdownMenuItem
+                            onClick={() => window.location.reload()}
+                        >
+                            <RotateCw className="mr-2 h-4 w-4" />
+                            Rafraîchir la liste
+                        </DropdownMenuItem>
+                    </DropdownMenuContent>
+                </DropdownMenu>
             </div>
 
             <ContextMenu>

@@ -1,14 +1,14 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { supabase } from "@/lib/supabaseClient";
-import type { Database } from "@/lib/database.types";
-import { TrendingUp, Target, Clock, Award } from "lucide-react";
 import Spinner from "@/components/ui/Spinner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import StatCard from "./StatCard";
+import type { Database } from "@/lib/database.types";
+import { supabase } from "@/lib/supabaseClient";
+import { Award, BarChart3, Clock, Target, TrendingUp } from "lucide-react";
+import { useEffect, useState } from "react";
 import FunnelStep from "./FunnelStep";
 import InsightsList from "./InsightsList";
+import StatCard from "./StatCard";
 
 type Application = Database["public"]["Tables"]["applications"]["Row"];
 
@@ -131,7 +131,7 @@ export default function AnalyticsPanel() {
 
     if (loading) {
         return (
-            <div className="flex items-center justify-center h-full">
+            <div className="flex items-center justify-center h-64">
                 <Spinner size={48} />
             </div>
         );
@@ -139,36 +139,38 @@ export default function AnalyticsPanel() {
 
     if (!stats)
         return (
-            <p className="text-muted-foreground">Aucune donnée à analyser.</p>
+            <p className="text-muted-foreground text-center py-10">
+                Aucune donnée à analyser.
+            </p>
         );
 
     return (
-        <div className="p-4 md:p-6 space-y-6">
-            <div>
-                <h2 className="text-2xl font-bold text-foreground mb-2">
-                    Analyse
+        <div className="max-w-6xl mx-auto p-4 md:p-6 space-y-8 animate-in fade-in duration-700">
+            <div className="flex flex-col gap-1">
+                <h2 className="text-3xl font-bold text-foreground tracking-tight">
+                    Données
                 </h2>
-                <p className="text-muted-foreground">
-                    Analysez vos performances et optimisez votre recherche
+                <p className="text-muted-foreground text-lg">
+                    Une vue d&apos;ensemble de votre performance.
                 </p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 <StatCard
                     icon={Target}
-                    title="Candidatures totales"
+                    title="Candidatures"
                     value={stats.total}
                     color="primary"
                 />
                 <StatCard
                     icon={TrendingUp}
-                    title="Taux de conversion"
+                    title="Conversion"
                     value={`${stats.conversionRate}%`}
                     color="primary-variant"
                 />
                 <StatCard
                     icon={Clock}
-                    title="Délai moyen de réponse"
+                    title="Réponse moy."
                     value={
                         stats.averageResponseTime > 0
                             ? `${stats.averageResponseTime}j`
@@ -178,49 +180,58 @@ export default function AnalyticsPanel() {
                 />
                 <StatCard
                     icon={Award}
-                    title="Offres reçues"
+                    title="Offres"
                     value={stats.offers}
                     color="success"
                 />
             </div>
 
-            <InsightsList insights={insights} />
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <Card className="glass-card lg:col-span-2 border-0 shadow-lg">
+                    <CardHeader className="pb-2">
+                        <div className="flex items-center gap-2">
+                            <div className="p-2 rounded-lg bg-primary/10 text-primary">
+                                <BarChart3 className="w-5 h-5" />
+                            </div>
+                            <CardTitle className="text-lg font-semibold text-foreground">
+                                Entonnoir de conversion
+                            </CardTitle>
+                        </div>
+                    </CardHeader>
+                    <CardContent className="space-y-6 pt-4">
+                        <FunnelStep
+                            label="Candidatures envoyées"
+                            value={stats.applied}
+                            progress={100}
+                            color="var(--color-primary)"
+                        />
+                        <FunnelStep
+                            label="Processus d'entretien"
+                            value={stats.interviews}
+                            progress={
+                                stats.applied > 0
+                                    ? (stats.interviews / stats.applied) * 100
+                                    : 0
+                            }
+                            color="var(--color-primary)"
+                        />
+                        <FunnelStep
+                            label="Offres reçues"
+                            value={stats.offers}
+                            progress={
+                                stats.applied > 0
+                                    ? (stats.offers / stats.applied) * 100
+                                    : 0
+                            }
+                            color="var(--color-success)"
+                        />
+                    </CardContent>
+                </Card>
 
-            <Card>
-                <CardHeader>
-                    <CardTitle className="text-foreground">
-                        Entonnoir de conversion
-                    </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                    <FunnelStep
-                        label="Candidatures envoyées"
-                        value={stats.applied}
-                        progress={100}
-                        color="var(--color-primary)"
-                    />
-                    <FunnelStep
-                        label="Processus d'entretien"
-                        value={stats.interviews}
-                        progress={
-                            stats.applied > 0
-                                ? (stats.interviews / stats.applied) * 100
-                                : 0
-                        }
-                        color="var(--color-primary)"
-                    />
-                    <FunnelStep
-                        label="Offres reçues"
-                        value={stats.offers}
-                        progress={
-                            stats.applied > 0
-                                ? (stats.offers / stats.applied) * 100
-                                : 0
-                        }
-                        color="var(--color-success)"
-                    />
-                </CardContent>
-            </Card>
+                <div className="lg:col-span-1">
+                    <InsightsList insights={insights} />
+                </div>
+            </div>
         </div>
     );
 }

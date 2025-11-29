@@ -1,18 +1,16 @@
 "use client";
 
-import { useState } from "react";
-import { supabase } from "@/lib/supabaseClient";
-import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
     Dialog,
     DialogContent,
+    DialogDescription,
     DialogHeader,
     DialogTitle,
     DialogTrigger,
-    DialogDescription,
 } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
     Select,
     SelectContent,
@@ -20,8 +18,10 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
-import { Label } from "@/components/ui/label";
-import { Upload, FileText, Loader2 } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/lib/supabaseClient";
+import { FileText, Loader2, Upload } from "lucide-react";
+import { useState } from "react";
 import { toast } from "sonner";
 
 export function DocumentUploadModal({
@@ -103,7 +103,7 @@ export function DocumentUploadModal({
             setFile(null);
             setName("");
             onUploadComplete();
-        } catch (error) {
+        } catch (error: unknown) {
             console.error(error);
             if (error instanceof Error) {
                 toast.error("Erreur lors de l'upload: " + error.message);
@@ -119,32 +119,34 @@ export function DocumentUploadModal({
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
                 {trigger || (
-                    <Button className="gap-2">
+                    <Button className="gap-2 bg-primary/90 hover:bg-primary text-primary-foreground shadow-lg hover:shadow-xl transition-all duration-300 rounded-full px-6">
                         <Upload className="w-4 h-4" />
                         Ajouter un document
                     </Button>
                 )}
             </DialogTrigger>
-            <DialogContent className="sm:max-w-md">
+            <DialogContent className="sm:max-w-md glass-heavy border-0 ring-1 ring-white/20 shadow-2xl">
                 <DialogHeader>
-                    <DialogTitle>Ajouter un document</DialogTitle>
-                    <DialogDescription>
+                    <DialogTitle className="text-xl font-semibold text-foreground">
+                        Ajouter un document
+                    </DialogTitle>
+                    <DialogDescription className="text-muted-foreground">
                         Stockez vos CV et lettres de motivation.
                     </DialogDescription>
                 </DialogHeader>
-                <div className="space-y-4 py-4">
+                <div className="space-y-5 py-4">
                     <div className="space-y-2">
                         <Label>Type de document</Label>
                         <Select
                             value={type}
-                            onValueChange={(v) =>
-                                setType(v as "cv" | "cover_letter")
+                            onValueChange={(v: "cv" | "cover_letter") =>
+                                setType(v)
                             }
                         >
-                            <SelectTrigger>
+                            <SelectTrigger className="bg-white/50 dark:bg-black/20 border-border/50 backdrop-blur-sm">
                                 <SelectValue />
                             </SelectTrigger>
-                            <SelectContent>
+                            <SelectContent className="glass-heavy border-border/50">
                                 <SelectItem value="cv">CV</SelectItem>
                                 <SelectItem value="cover_letter">
                                     Lettre de motivation
@@ -159,41 +161,59 @@ export function DocumentUploadModal({
                             value={name}
                             onChange={(e) => setName(e.target.value)}
                             placeholder="Ex: CV Développeur React 2025"
+                            className="bg-white/50 dark:bg-black/20 border-border/50 backdrop-blur-sm focus:ring-primary/50"
                         />
                     </div>
 
                     <div className="space-y-2">
                         <Label>Fichier (PDF recommandé)</Label>
-                        <div className="border-2 border-dashed border-border rounded-lg p-6 flex flex-col items-center justify-center text-center cursor-pointer hover:bg-muted/50 transition-colors relative">
+                        <div className="border-2 border-dashed border-border/60 rounded-xl p-8 flex flex-col items-center justify-center text-center cursor-pointer hover:bg-primary/5 hover:border-primary/50 transition-all duration-300 relative bg-white/30 dark:bg-black/10 backdrop-blur-sm group">
                             <input
                                 type="file"
                                 accept=".pdf,.doc,.docx"
                                 onChange={handleFileChange}
-                                className="absolute inset-0 opacity-0 cursor-pointer"
+                                className="absolute inset-0 opacity-0 cursor-pointer z-10"
                             />
                             {file ? (
-                                <div className="flex items-center gap-2 text-primary font-medium">
-                                    <FileText className="w-6 h-6" />
-                                    {file.name}
+                                <div className="flex flex-col items-center gap-2 text-primary font-medium animate-in zoom-in-50 duration-300">
+                                    <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center mb-1">
+                                        <FileText className="w-6 h-6" />
+                                    </div>
+                                    <span className="text-sm underline decoration-dotted underline-offset-4">
+                                        {file.name}
+                                    </span>
+                                    <span className="text-xs text-muted-foreground font-normal">
+                                        Cliquez pour changer
+                                    </span>
                                 </div>
                             ) : (
                                 <>
-                                    <Upload className="w-8 h-8 text-muted-foreground mb-2" />
-                                    <p className="text-sm text-muted-foreground">
+                                    <div className="h-12 w-12 rounded-full bg-muted/50 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
+                                        <Upload className="w-6 h-6 text-muted-foreground group-hover:text-primary" />
+                                    </div>
+                                    <p className="text-sm font-medium text-foreground">
                                         Cliquez ou glissez un fichier ici
+                                    </p>
+                                    <p className="text-xs text-muted-foreground/80 mt-1">
+                                        PDF, DOCX jusqu&apos;à 5MB
                                     </p>
                                 </>
                             )}
                         </div>
                     </div>
                 </div>
-                <div className="flex justify-end gap-3">
-                    <Button variant="ghost" onClick={() => setOpen(false)}>
+                <div className="flex justify-end gap-3 pt-2">
+                    <Button
+                        variant="ghost"
+                        onClick={() => setOpen(false)}
+                        className="hover:bg-black/5"
+                    >
                         Annuler
                     </Button>
                     <Button
                         onClick={handleUpload}
                         disabled={!file || !name || loading}
+                        className="bg-primary hover:bg-primary/90 shadow-md transition-all"
                     >
                         {loading && (
                             <Loader2 className="w-4 h-4 mr-2 animate-spin" />

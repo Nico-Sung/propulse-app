@@ -32,7 +32,6 @@ export default function CalendarEventItem({ event }: { event: CalendarEvent }) {
                     "opacity-60 grayscale-[0.5] hover:opacity-100 hover:grayscale-0"
             )}
         >
-            {}
             <div
                 className={cn(
                     "absolute left-0 top-4 bottom-4 w-1 rounded-r-full opacity-0 transition-opacity group-hover:opacity-100",
@@ -40,7 +39,6 @@ export default function CalendarEventItem({ event }: { event: CalendarEvent }) {
                 )}
             />
 
-            {}
             <div className="flex flex-col items-center gap-1 min-w-[4rem] pt-0.5">
                 <span className="text-sm font-bold text-foreground">
                     {event.date.toLocaleTimeString("fr-FR", {

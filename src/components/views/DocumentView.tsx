@@ -1,16 +1,16 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { supabase } from "@/lib/supabaseClient";
+import ConfirmationDialog from "@/components/design-system/confirm-dialog";
+import Spinner from "@/components/ui/Spinner";
 import { useAuth } from "@/contexts/AuthContext";
 import { Database } from "@/lib/database.types";
-import Spinner from "@/components/ui/Spinner";
+import { supabase } from "@/lib/supabaseClient";
 import { FileText } from "lucide-react";
-import ConfirmationDialog from "@/components/design-system/confirm-dialog";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { DocumentUploadModal } from "../dashboard/documents/DocumentUploadModal";
 import { DocumentCard } from "../dashboard/documents/DocumentCard";
 import { DocumentPreviewModal } from "../dashboard/documents/DocumentPreviewModal";
+import { DocumentUploadModal } from "../dashboard/documents/DocumentUploadModal";
 
 type Document = Database["public"]["Tables"]["documents"]["Row"];
 
@@ -57,39 +57,44 @@ export default function DocumentsView() {
         setDeleteDoc(null);
     };
 
+    if (loading) {
+        return (
+            <div className="flex items-center justify-center h-screen">
+                <Spinner size={48} />
+            </div>
+        );
+    }
+
     return (
-        <div className="p-6 w-full max-w-7xl mx-auto min-h-screen">
-            <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
-                <div>
-                    <h2 className="text-2xl font-bold text-foreground mb-1">
+        <div className="max-w-7xl mx-auto p-4 md:p-6 space-y-8 animate-in fade-in duration-700">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div className="flex flex-col gap-1">
+                    <h2 className="text-3xl font-bold text-foreground tracking-tight">
                         Documents
                     </h2>
-                    <p className="text-muted-foreground">
+                    <p className="text-muted-foreground text-lg">
                         Centralisez vos CVs et lettres de motivation.
                     </p>
                 </div>
                 <DocumentUploadModal onUploadComplete={loadDocuments} />
             </div>
 
-            {loading ? (
-                <div className="flex justify-center py-12">
-                    <Spinner size={32} />
-                </div>
-            ) : documents.length === 0 ? (
-                <div className="text-center py-20 bg-muted/30 rounded-xl border border-dashed border-border">
-                    <div className="bg-background rounded-full p-4 w-16 h-16 mx-auto mb-4 flex items-center justify-center shadow-sm">
-                        <FileText className="w-8 h-8 text-muted-foreground" />
+            {documents.length === 0 ? (
+                <div className="glass-card flex flex-col items-center justify-center py-20 text-center rounded-2xl border-dashed border-2 border-muted/50">
+                    <div className="h-20 w-20 bg-primary/10 rounded-full flex items-center justify-center mb-4 backdrop-blur-md shadow-inner">
+                        <FileText className="w-10 h-10 text-primary" />
                     </div>
-                    <h3 className="text-lg font-semibold text-foreground">
-                        C&apos;est un peu vide ici
+                    <h3 className="text-xl font-semibold text-foreground">
+                        La bibliothèque est vide
                     </h3>
                     <p className="text-muted-foreground max-w-sm mx-auto mt-2 mb-6">
-                        Ajoutez votre premier CV pour commencer.
+                        Ajoutez votre premier CV pour commencer à construire
+                        votre dossier de candidature.
                     </p>
                     <DocumentUploadModal onUploadComplete={loadDocuments} />
                 </div>
             ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 content-start items-start w-full">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 content-start items-start w-full">
                     {documents.map((doc) => (
                         <DocumentCard
                             key={doc.id}
