@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
-import { supabase } from "@/lib/supabaseClient";
 import { Database } from "@/lib/database.types";
+import { supabase } from "@/lib/supabaseClient";
+import { useCallback, useEffect, useState } from "react";
 
+import ConfirmationDialog from "@/components/design-system/confirm-dialog";
 import { Button } from "@/components/ui/button";
 import {
     Select,
@@ -12,12 +13,11 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
-import { Link as LinkIcon, Plus, FileText } from "lucide-react";
+import { FileText, Link as LinkIcon, Plus } from "lucide-react";
 import { toast } from "sonner";
-import ConfirmationDialog from "@/components/design-system/confirm-dialog";
-import { DocumentUploadModal } from "../../documents/DocumentUploadModal";
-import { DocumentPreviewModal } from "../../documents/DocumentPreviewModal";
 import { DocumentCard } from "../../documents/DocumentCard";
+import { DocumentPreviewModal } from "../../documents/DocumentPreviewModal";
+import { DocumentUploadModal } from "../../documents/DocumentUploadModal";
 
 type Document = Database["public"]["Tables"]["documents"]["Row"];
 
@@ -108,10 +108,10 @@ export function DocumentsTab({ applicationId }: { applicationId: string }) {
     };
 
     return (
-        <div className="space-y-8">
-            <div className="flex flex-col sm:flex-row gap-4 p-4 bg-muted/30 rounded-lg border border-border/50">
+        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <div className="flex flex-col sm:flex-row gap-4 p-6 rounded-2xl bg-white/40 dark:bg-white/5 border border-white/20 dark:border-white/10 backdrop-blur-md shadow-sm">
                 <div className="flex-1 space-y-2">
-                    <label className="text-sm font-medium text-foreground">
+                    <label className="text-xs font-semibold uppercase text-muted-foreground ml-1">
                         Lier un document existant
                     </label>
                     <div className="flex gap-2">
@@ -119,10 +119,10 @@ export function DocumentsTab({ applicationId }: { applicationId: string }) {
                             value={selectedDocId}
                             onValueChange={setSelectedDocId}
                         >
-                            <SelectTrigger className="bg-background">
+                            <SelectTrigger className="bg-white/50 dark:bg-black/10 border-black/5 dark:border-white/10 h-10">
                                 <SelectValue placeholder="Choisir un document..." />
                             </SelectTrigger>
-                            <SelectContent>
+                            <SelectContent className="glass-heavy">
                                 {availableDocs.length === 0 ? (
                                     <div className="p-2 text-sm text-muted-foreground text-center">
                                         Aucun document disponible
@@ -140,6 +140,7 @@ export function DocumentsTab({ applicationId }: { applicationId: string }) {
                             variant="secondary"
                             onClick={linkDocument}
                             disabled={!selectedDocId}
+                            className="bg-white/80 dark:bg-white/10 hover:bg-white dark:hover:bg-white/20 h-10"
                         >
                             <LinkIcon className="w-4 h-4 mr-2" />
                             Lier
@@ -151,7 +152,7 @@ export function DocumentsTab({ applicationId }: { applicationId: string }) {
                         onUploadComplete={loadData}
                         defaultApplicationId={applicationId}
                         trigger={
-                            <Button className="w-full sm:w-auto">
+                            <Button className="w-full sm:w-auto h-10 bg-primary hover:bg-primary/90 shadow-md rounded-full px-6">
                                 <Plus className="w-4 h-4 mr-2" />
                                 Nouveau Doc
                             </Button>
@@ -161,21 +162,17 @@ export function DocumentsTab({ applicationId }: { applicationId: string }) {
             </div>
 
             <div className="space-y-4">
-                <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
-                    Documents associés ({linkedDocs.length})
-                </h3>
-
                 {linkedDocs.length === 0 ? (
-                    <div className="text-center py-8 border border-dashed border-border rounded-lg">
-                        <FileText className="w-8 h-8 text-muted-foreground mx-auto mb-2 opacity-50" />
+                    <div className="text-center py-12 bg-muted/20 border border-dashed border-border rounded-2xl">
+                        <FileText className="w-10 h-10 text-muted-foreground mx-auto mb-3 opacity-30" />
                         <p className="text-sm text-muted-foreground">
-                            Aucun document lié à cette candidature
+                            Aucun document lié pour l&apos;instant
                         </p>
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         {linkedDocs.map((doc) => (
-                            <div key={doc.id} className="relative group">
+                            <div key={doc.id} className="relative group h-full">
                                 <DocumentCard
                                     doc={doc}
                                     onPreview={() => setPreviewDoc(doc)}
@@ -201,7 +198,7 @@ export function DocumentsTab({ applicationId }: { applicationId: string }) {
                 open={!!unlinkDoc}
                 onOpenChange={(open) => !open && setUnlinkDoc(null)}
                 title="Détacher le document ?"
-                description="Le document restera dans votre bibliothèque globale mais ne sera plus lié à cette candidature."
+                description="Le document restera dans votre bibliothèque mais ne sera plus lié ici."
                 confirmLabel="Détacher"
                 cancelLabel="Annuler"
                 onConfirm={handleUnlink}
@@ -211,7 +208,7 @@ export function DocumentsTab({ applicationId }: { applicationId: string }) {
                 open={!!deleteDoc}
                 onOpenChange={(open) => !open && setDeleteDoc(null)}
                 title="Supprimer définitivement ?"
-                description="Attention : Ce document sera supprimé de votre bibliothèque et de toutes les candidatures associées."
+                description="Attention : Suppression définitive de la bibliothèque."
                 confirmLabel="Supprimer"
                 cancelLabel="Annuler"
                 onConfirm={handleDelete}

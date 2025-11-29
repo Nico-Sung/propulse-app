@@ -59,17 +59,9 @@ export default function CalendarDay({ events }: CalendarDayProps) {
                 </div>
             </div>
 
-            <div className="relative ml-7 md:ml-7 space-y-4 border-l-2 border-dashed border-border/50 pl-8 pb-8 last:pb-0 last:border-transparent">
+            <div className="space-y-4">
                 {events.map((event) => (
-                    <div key={event.id} className="relative">
-                        <div
-                            className={cn(
-                                "absolute -left-[37px] top-6 h-3 w-3 rounded-full border-2 border-background ring-1",
-                                event.type === "interview"
-                                    ? "bg-primary ring-primary/30"
-                                    : "bg-amber-500 ring-amber-500/30"
-                            )}
-                        />
+                    <div key={event.id}>
                         <CalendarEventItem event={event} />
                     </div>
                 ))}
