@@ -257,16 +257,16 @@ export function ApplicationCard({
                                 </div>
 
                                 {!compact && (
-                                    <div className="opacity-0 group-hover:opacity-100 transition-opacity -mr-2 -mt-2">
+                                    <div
+                                        className="transition-opacity -mr-2 -mt-2 opacity-100 md:opacity-0 md:group-hover:opacity-100 relative z-10"
+                                        onClick={(e) => e.stopPropagation()}
+                                    >
                                         <DropdownMenu>
                                             <DropdownMenuTrigger asChild>
                                                 <Button
                                                     variant="ghost"
                                                     size="icon"
                                                     className="h-6 w-6 text-muted-foreground hover:text-foreground"
-                                                    onClick={(e) =>
-                                                        e.stopPropagation()
-                                                    }
                                                 >
                                                     <MoreHorizontal className="h-4 w-4" />
                                                 </Button>
@@ -274,7 +274,9 @@ export function ApplicationCard({
 
                                             <DropdownMenuContent
                                                 align="end"
-                                                className="w-72 bg-white/95 dark:bg-zinc-900/95 backdrop-blur-xl border border-white/20 shadow-xl p-1"
+                                                sideOffset={8}
+                                                collisionPadding={16}
+                                                className="w-64 bg-white/95 dark:bg-zinc-900/95 backdrop-blur-xl border border-white/20 shadow-xl p-1 z-50"
                                             >
                                                 <DropdownMenuItem
                                                     onClick={(e) => {
@@ -290,11 +292,16 @@ export function ApplicationCard({
                                                 <DropdownMenuSeparator className="bg-border/50" />
 
                                                 <DropdownMenuSub>
-                                                    <DropdownMenuSubTrigger className="rounded-md focus:bg-primary/10 focus:text-primary">
+                                                    <DropdownMenuSubTrigger className="rounded-md focus:bg-primary/10 focus:text-primary z-50">
                                                         <TagIcon className="mr-2 h-4 w-4" />
                                                         Étiquettes
                                                     </DropdownMenuSubTrigger>
-                                                    <DropdownMenuSubContent className="w-64 p-2 bg-white/95 dark:bg-zinc-900/95 backdrop-blur-xl border border-white/20 shadow-xl">
+                                                    <DropdownMenuSubContent
+                                                        className="w-64 p-2 bg-white/95 dark:bg-zinc-900/95 backdrop-blur-xl border border-white/20 shadow-xl z-[60]"
+                                                        sideOffset={2}
+                                                        alignOffset={-5}
+                                                        collisionPadding={16}
+                                                    >
                                                         <DropdownMenuLabel>
                                                             Sélectionner des
                                                             étiquettes
@@ -302,7 +309,7 @@ export function ApplicationCard({
                                                         {allTags.map((tag) => (
                                                             <div
                                                                 key={tag.id}
-                                                                className="flex items-center gap-2 py-1 px-2 hover:bg-muted/50 rounded-md cursor-pointer group/item transition-colors"
+                                                                className="flex items-center gap-2 py-1 px-2 hover:bg-muted/50 rounded-md cursor-pointer group/item transition-colors z-50"
                                                                 onClick={(
                                                                     e
                                                                 ) => {
@@ -372,7 +379,14 @@ export function ApplicationCard({
                                                                 </Button>
                                                             )}
                                                             {isCreatingTag && (
-                                                                <div className="space-y-2">
+                                                                <div
+                                                                    className="space-y-2"
+                                                                    onClick={(
+                                                                        e
+                                                                    ) =>
+                                                                        e.stopPropagation()
+                                                                    }
+                                                                >
                                                                     <Input
                                                                         placeholder="Nom"
                                                                         className="h-8 text-xs"
@@ -393,6 +407,7 @@ export function ApplicationCard({
                                                                         ) =>
                                                                             e.stopPropagation()
                                                                         }
+                                                                        autoFocus
                                                                     />
                                                                     <div className="flex gap-1 flex-wrap">
                                                                         {TAG_COLORS.map(
@@ -438,11 +453,14 @@ export function ApplicationCard({
                                                 </DropdownMenuSub>
 
                                                 <DropdownMenuSub>
-                                                    <DropdownMenuSubTrigger className="rounded-md focus:bg-primary/10 focus:text-primary">
+                                                    <DropdownMenuSubTrigger className="rounded-md focus:bg-primary/10 focus:text-primary z-50">
                                                         <ArrowRight className="mr-2 h-4 w-4" />
                                                         Déplacer vers...
                                                     </DropdownMenuSubTrigger>
-                                                    <DropdownMenuSubContent className="w-48 bg-white/95 dark:bg-zinc-900/95 backdrop-blur-xl border border-white/20 shadow-xl p-1">
+                                                    <DropdownMenuSubContent
+                                                        className="w-48 bg-white/95 dark:bg-zinc-900/95 backdrop-blur-xl border border-white/20 shadow-xl p-1 z-[60]"
+                                                        collisionPadding={16}
+                                                    >
                                                         <DropdownMenuRadioGroup
                                                             value={
                                                                 application.status
@@ -575,7 +593,10 @@ export function ApplicationCard({
                         </div>
                     </ContextMenuTrigger>
 
-                    <ContextMenuContent className="w-72 bg-white/95 dark:bg-zinc-900/95 backdrop-blur-xl border border-white/20 shadow-xl p-1">
+                    <ContextMenuContent
+                        className="w-64 bg-white/95 dark:bg-zinc-900/95 backdrop-blur-xl border border-white/20 shadow-xl p-1"
+                        collisionPadding={16}
+                    >
                         <ContextMenuItem
                             onClick={onCardClick}
                             className="font-medium rounded-md focus:bg-primary/10 focus:text-primary"
@@ -591,7 +612,10 @@ export function ApplicationCard({
                                 <TagIcon className="mr-2 h-4 w-4" />
                                 Étiquettes
                             </ContextMenuSubTrigger>
-                            <ContextMenuSubContent className="w-64 p-2 bg-white/95 dark:bg-zinc-900/95 backdrop-blur-xl border border-white/20 shadow-xl">
+                            <ContextMenuSubContent
+                                className="w-64 p-2 bg-white/95 dark:bg-zinc-900/95 backdrop-blur-xl border border-white/20 shadow-xl"
+                                collisionPadding={16}
+                            >
                                 <ContextMenuLabel>
                                     Sélectionner des étiquettes
                                 </ContextMenuLabel>
@@ -720,7 +744,10 @@ export function ApplicationCard({
                                 <ArrowRight className="mr-2 h-4 w-4" />
                                 Déplacer vers...
                             </ContextMenuSubTrigger>
-                            <ContextMenuSubContent className="w-48 bg-white/95 dark:bg-zinc-900/95 backdrop-blur-xl border border-white/20 shadow-xl p-1">
+                            <ContextMenuSubContent
+                                className="w-48 bg-white/95 dark:bg-zinc-900/95 backdrop-blur-xl border border-white/20 shadow-xl p-1"
+                                collisionPadding={16}
+                            >
                                 <ContextMenuRadioGroup
                                     value={application.status}
                                 >
