@@ -1,21 +1,20 @@
 "use client";
 
+import { useState, useEffect, useCallback } from "react";
+import { supabase } from "@/lib/supabaseClient";
+import { Database } from "@/lib/database.types";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Database } from "@/lib/database.types";
-import { supabase } from "@/lib/supabaseClient";
-import { cn } from "@/lib/utils";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
-    Calendar,
-    CheckSquare,
     Clock,
     FileText,
-    Loader2,
-    Send,
+    CheckSquare,
     Upload,
     UserPlus,
+    Calendar,
+    Loader2,
 } from "lucide-react";
-import { useCallback, useEffect, useState } from "react";
 
 type Activity = Database["public"]["Tables"]["activity_history"]["Row"];
 
@@ -23,25 +22,24 @@ interface ActivityHistorySectionProps {
     applicationId: string;
 }
 
-//eslint-disable-next-line @typescript-eslint/no-explicit-any
-const activityConfig: Record<string, { Icon: any; className: string }> = {
-    status_change: { Icon: Clock, className: "bg-blue-500/10 text-blue-500" },
-    note: { Icon: FileText, className: "bg-gray-500/10 text-gray-500" },
+const activityConfig: Record<
+    string,
+    { Icon: React.ElementType; className: string }
+> = {
+    status_change: { Icon: Clock, className: "bg-primary/10 text-primary" },
+    note: { Icon: FileText, className: "bg-surface text-muted-foreground" },
     task_completed: {
         Icon: CheckSquare,
-        className: "bg-green-500/10 text-green-500",
+        className: "bg-primary/10 text-primary",
     },
     document_added: {
         Icon: Upload,
-        className: "bg-purple-500/10 text-purple-500",
+        className: "bg-accent/10 text-accent",
     },
-    contact_added: {
-        Icon: UserPlus,
-        className: "bg-orange-500/10 text-orange-500",
-    },
+    contact_added: { Icon: UserPlus, className: "bg-warning/10 text-warning" },
     interview_scheduled: {
         Icon: Calendar,
-        className: "bg-pink-500/10 text-pink-500",
+        className: "bg-success/10 text-success",
     },
 };
 
@@ -86,42 +84,37 @@ export function HistoryTab({ applicationId }: ActivityHistorySectionProps) {
     };
 
     return (
-        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <div className="flex gap-3 items-end bg-white/40 dark:bg-white/5 border border-white/20 p-2 rounded-3xl backdrop-blur-md shadow-sm focus-within:ring-2 focus-within:ring-primary/30 transition-all">
+        <div className="space-y-6">
+            <div className="space-y-2">
                 <Textarea
                     value={newNote}
                     onChange={(e) => setNewNote(e.target.value)}
-                    placeholder="Ajouter une note rapide..."
-                    rows={1}
-                    className="min-h-[40px] max-h-[120px] bg-transparent border-none shadow-none resize-none focus-visible:ring-0 py-3 px-4"
+                    placeholder="Ajouter une note..."
+                    rows={3}
                 />
                 <Button
                     onClick={addNote}
                     disabled={isAddingNote || !newNote.trim()}
-                    size="icon"
-                    className="rounded-full h-10 w-10 shrink-0 bg-primary hover:bg-primary/90 mb-0.5 mr-0.5"
+                    className="w-full"
                 >
-                    {isAddingNote ? (
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                    ) : (
-                        <Send className="w-4 h-4 ml-0.5" />
+                    {isAddingNote && (
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     )}
+                    Ajouter une note
                 </Button>
             </div>
 
-            <div className="relative space-y-6 pl-4 before:absolute before:left-[27px] before:top-2 before:bottom-0 before:w-px before:bg-gradient-to-b before:from-border before:to-transparent">
+            <div className="space-y-4">
                 {loading && (
-                    <p className="text-center text-muted-foreground py-4">
-                        Chargement...
+                    <p className="text-center text-muted-foreground">
+                        Chargement de l&apos;historique...
                     </p>
                 )}
-
                 {!loading && activities.length === 0 && (
-                    <p className="text-center text-muted-foreground py-8 italic opacity-50">
-                        Aucune activité enregistrée.
+                    <p className="text-center text-muted-foreground py-8">
+                        Aucun historique pour le moment.
                     </p>
                 )}
-
                 {!loading &&
                     activities.map((activity) => {
                         const config = activityConfig[
@@ -131,37 +124,30 @@ export function HistoryTab({ applicationId }: ActivityHistorySectionProps) {
                             className: "bg-slate-100 text-slate-600",
                         };
                         const Icon = config.Icon;
-
                         return (
                             <div
                                 key={activity.id}
-                                className="relative flex gap-4 items-start group"
+                                className="flex gap-3 items-start"
                             >
-                                <div
-                                    className={cn(
-                                        "relative z-10 flex h-8 w-8 shrink-0 items-center justify-center rounded-full ring-4 ring-background shadow-sm",
-                                        config.className
-                                    )}
-                                >
-                                    <Icon className="w-4 h-4" />
-                                </div>
-
-                                <div className="flex-1 pt-1.5">
-                                    <div className="bg-white/40 dark:bg-white/5 border border-white/20 dark:border-white/10 rounded-xl p-3 backdrop-blur-sm shadow-sm hover:shadow-md transition-all">
-                                        <p className="text-sm text-foreground/90 leading-relaxed">
-                                            {activity.description}
-                                        </p>
-                                        <p className="text-[10px] text-muted-foreground mt-2 font-medium uppercase tracking-wide opacity-70">
-                                            {new Date(
-                                                activity.created_at
-                                            ).toLocaleString("fr-FR", {
-                                                day: "numeric",
-                                                month: "short",
-                                                hour: "2-digit",
-                                                minute: "2-digit",
-                                            })}
-                                        </p>
-                                    </div>
+                                <Avatar>
+                                    <AvatarFallback
+                                        className={config.className}
+                                    >
+                                        <Icon className="w-4 h-4" />
+                                    </AvatarFallback>
+                                </Avatar>
+                                <div className="flex-1 bg-surface rounded-lg p-3 border border-default">
+                                    <p className="text-sm text-foreground">
+                                        {activity.description}
+                                    </p>
+                                    <p className="text-xs text-muted-foreground mt-1">
+                                        {new Date(
+                                            activity.created_at
+                                        ).toLocaleString("fr-FR", {
+                                            dateStyle: "long",
+                                            timeStyle: "short",
+                                        })}
+                                    </p>
                                 </div>
                             </div>
                         );
