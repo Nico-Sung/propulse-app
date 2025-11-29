@@ -1,20 +1,20 @@
 "use client";
 
-import { useState } from "react";
-import { supabase } from "@/lib/supabaseClient";
-import { Database } from "@/lib/database.types";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import {
     Select,
-    SelectTrigger,
     SelectContent,
     SelectItem,
+    SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
-import { ExternalLink, Briefcase, Calendar, DollarSign } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
+import { Database } from "@/lib/database.types";
+import { supabase } from "@/lib/supabaseClient";
+import { Briefcase, Calendar, DollarSign, ExternalLink } from "lucide-react";
+import { useState } from "react";
 
 type Application = Database["public"]["Tables"]["applications"]["Row"];
 

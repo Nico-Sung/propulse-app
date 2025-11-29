@@ -1,27 +1,23 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import {
-    Card,
-    CardHeader,
-    CardTitle,
-    CardContent,
-    CardDescription,
-} from "@/components/ui/card";
-import { supabase } from "@/lib/supabaseClient";
+import { Button } from "@/components/ui/button";
+import Spinner from "@/components/ui/Spinner";
 import { useAuth } from "@/contexts/AuthContext";
 import type { Database } from "@/lib/database.types";
-import { CheckCircle2 } from "lucide-react";
-import Spinner from "@/components/ui/Spinner";
+import { supabase } from "@/lib/supabaseClient";
+import { cn } from "@/lib/utils";
+import { Eye, EyeOff, Sparkles } from "lucide-react";
+import { useEffect, useState } from "react";
 import { DailyActionsHeader } from "./DailyActionsHeader";
 import { DailyActionsList } from "./DailyActionsList";
 
 type Application = Database["public"]["Tables"]["applications"]["Row"];
 type Task = Database["public"]["Tables"]["tasks"]["Row"];
 
-type TaskWithApplication = Task & {
-    applications: Application | null;
-};
+
+interface TaskWithApplication extends Task {
+    applications: Application | null; 
+}
 
 export interface DailyAction {
     id: string;
@@ -39,6 +35,7 @@ export default function DailyActions({
 }) {
     const [actions, setActions] = useState<DailyAction[]>(initialActions || []);
     const [loading, setLoading] = useState(true);
+    const [hideFollowUps, setHideFollowUps] = useState(false);
     const { user } = useAuth();
 
     useEffect(() => {
@@ -54,22 +51,33 @@ export default function DailyActions({
         const today = new Date();
         today.setHours(0, 0, 0, 0);
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const { data: apps } = await (supabase as any)
+        const { data: appsData, error: appsError } = await supabase
             .from("applications")
             .select("*")
             .order("created_at", { ascending: false });
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const { data: tasksData } = await (supabase as any)
+        if (appsError) {
+            console.error("Error loading apps", appsError);
+        }
+
+        const apps = (appsData as Application[]) || [];
+
+        const { data: tasksData, error: tasksError } = await supabase
             .from("tasks")
             .select("*, applications(*)")
             .eq("is_completed", false);
 
+        if (tasksError) {
+            console.error("Error loading tasks", tasksError);
+        }
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const tasks = (tasksData as any[] as TaskWithApplication[]) || [];
+
         const actionsList: DailyAction[] = [];
 
         if (apps) {
-            apps.forEach((app: Application) => {
+            apps.forEach((app) => {
                 if (app.deadline) {
                     const deadlineDate = new Date(app.deadline);
                     deadlineDate.setHours(0, 0, 0, 0);
@@ -83,18 +91,12 @@ export default function DailyActions({
                             id: `deadline-${app.id}`,
                             type: "deadline",
                             priority:
-                                daysUntilDeadline === 0
-                                    ? "high"
-                                    : daysUntilDeadline === 1
-                                    ? "medium"
-                                    : "low",
+                                daysUntilDeadline === 0 ? "high" : "medium",
                             application: app,
-                            description: `Date limite ${
+                            description: `Date limite : ${
                                 daysUntilDeadline === 0
-                                    ? "aujourd'hui"
-                                    : `dans ${daysUntilDeadline} jour${
-                                          daysUntilDeadline > 1 ? "s" : ""
-                                      }`
+                                    ? "Aujourd'hui"
+                                    : `Dans ${daysUntilDeadline}j`
                             }`,
                         });
                     }
@@ -118,18 +120,14 @@ export default function DailyActions({
                             priority:
                                 daysSinceContact >= 14 ? "high" : "medium",
                             application: app,
-                            description: `Aucune nouvelle depuis ${daysSinceContact} jour${
-                                daysSinceContact > 1 ? "s" : ""
-                            } - Envisager une relance`,
+                            description: `Sans nouvelle depuis ${daysSinceContact}j - Relancer ?`,
                         });
                     }
                 }
             });
         }
 
-        if (tasksData) {
-            const tasks = tasksData as unknown as TaskWithApplication[];
-
+        if (tasks) {
             tasks.forEach((task) => {
                 if (task.applications) {
                     actionsList.push({
@@ -170,55 +168,88 @@ export default function DailyActions({
                 })
                 .eq("id", action.task.id);
 
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            await (supabase as any).from("activity_history").insert({
-                application_id: action.application.id,
-                activity_type: "task_completed",
-                description: `Tâche complétée : ${action.task.title}`,
-            });
-
             await loadDailyActions();
         }
     };
 
+    const handleDismiss = (action: DailyAction) => {
+        setActions((prev) => prev.filter((a) => a.id !== action.id));
+    };
+
+    const filteredActions = actions.filter((action) => {
+        if (hideFollowUps && action.type === "follow_up") return false;
+        return true;
+    });
+
+    const hiddenCount = actions.length - filteredActions.length;
+
     return (
-        <Card>
-            <CardHeader>
-                <CardTitle className="text-2xl font-bold text-foreground ">
-                    Actions du jour
-                </CardTitle>
-                <CardDescription className="text-base text-muted-foreground">
-                    Concentrez-vous sur l&apos;essentiel
-                </CardDescription>
-            </CardHeader>
-            <CardContent>
-                {loading ? (
-                    <div className="flex items-center justify-center h-28">
-                        <Spinner size={32} />
+        <div className="max-w-3xl mx-auto space-y-6 animate-in fade-in duration-700">
+            <div className="flex flex-col gap-1 mb-8">
+                <h2 className="text-3xl font-bold text-foreground tracking-tight">
+                    Bonjour 👋
+                </h2>
+                <p className="text-muted-foreground text-lg">
+                    Voici votre focus pour aujourd&apos;hui.
+                </p>
+            </div>
+
+            {loading ? (
+                <div className="flex items-center justify-center h-40">
+                    <Spinner size={32} />
+                </div>
+            ) : actions.length === 0 ? (
+                <div className="glass-card flex flex-col items-center justify-center py-12 text-center rounded-2xl border-dashed border-2 border-muted">
+                    <div className="h-16 w-16 bg-primary/10 rounded-full flex items-center justify-center mb-4">
+                        <Sparkles className="w-8 h-8 text-primary" />
                     </div>
-                ) : actions.length === 0 ? (
-                    <div className="text-center py-6 bg-surface rounded-lg border-default">
-                        <CheckCircle2
-                            className="w-12 h-12 mx-auto mb-3"
-                            style={{ color: "var(--color-primary)" }}
-                        />
-                        <h3 className="text-lg font-semibold text-foreground mb-1">
-                            Tout est à jour !
-                        </h3>
-                        <p className="text-muted-foreground">
-                            Aucune action urgente pour aujourd&apos;hui
-                        </p>
+                    <h3 className="text-xl font-semibold text-foreground">
+                        Rien à signaler !
+                    </h3>
+                    <p className="text-muted-foreground max-w-sm mt-2">
+                        Vous êtes à jour sur vos tâches. Profitez-en pour faire
+                        une pause ou chercher de nouvelles offres.
+                    </p>
+                </div>
+            ) : (
+                <>
+                    <div className="flex items-center justify-between">
+                        <DailyActionsHeader count={filteredActions.length} />
+
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setHideFollowUps(!hideFollowUps)}
+                            className={cn(
+                                "text-xs font-medium gap-2 transition-all h-8",
+                                hideFollowUps
+                                    ? "text-primary bg-primary/10 hover:bg-primary/20"
+                                    : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                            )}
+                        >
+                            {hideFollowUps ? (
+                                <Eye className="w-3.5 h-3.5" />
+                            ) : (
+                                <EyeOff className="w-3.5 h-3.5" />
+                            )}
+                            {hideFollowUps
+                                ? "Afficher les relances"
+                                : "Masquer les relances"}
+                            {hideFollowUps && hiddenCount > 0 && (
+                                <span className="ml-1 bg-background/50 px-1.5 py-0.5 rounded-full text-[10px] shadow-sm">
+                                    +{hiddenCount}
+                                </span>
+                            )}
+                        </Button>
                     </div>
-                ) : (
-                    <>
-                        <DailyActionsHeader count={actions.length} />
-                        <DailyActionsList
-                            actions={actions}
-                            onComplete={completeTask}
-                        />
-                    </>
-                )}
-            </CardContent>
-        </Card>
+
+                    <DailyActionsList
+                        actions={filteredActions}
+                        onComplete={completeTask}
+                        onDismiss={handleDismiss}
+                    />
+                </>
+            )}
+        </div>
     );
 }

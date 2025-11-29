@@ -116,8 +116,8 @@ export function ApplicationCard({
     };
 
     const handleDuplicate = async () => {
-        // On utilise 'any' pour contourner l'erreur de typage stricte de Supabase sur l'insert
-        // L'objet est valide, mais les types générés peuvent être capricieux
+        
+        
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const { error } = await (supabase as any).from("applications").insert({
             user_id: application.user_id,
