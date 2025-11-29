@@ -19,7 +19,6 @@ import {
 import { useState } from "react";
 import { COLUMN_LABELS } from "../../../../hooks/useApplicationActions";
 
-// Imports UI Radix
 import {
     ContextMenuContent,
     ContextMenuItem,
