@@ -2,6 +2,7 @@
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import TextReveal from "@/components/ui/text-reveal";
 import { ArrowRight, CheckCircle2, Sparkles } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -20,20 +21,33 @@ export default function HeroSection() {
                     </Badge>
                 </div>
 
-                <h1 className="text-5xl md:text-7xl font-bold tracking-tight text-foreground max-w-4xl leading-[1.1] animate-in fade-in slide-in-from-bottom-8 duration-1000 fill-mode-backwards delay-100">
-                    Organisez votre réussite <br />
-                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-purple-600">
-                        sans le chaos.
-                    </span>
-                </h1>
+                <div className="max-w-4xl flex flex-col items-center">
+  
+                    <TextReveal
+                        as="h1"
+                        text="Organisez votre réussite"
+                        className="text-5xl md:text-7xl font-bold tracking-tight text-foreground justify-center leading-[1.1] [&_span]:pb-3"
+                    />
 
-                <p className="text-lg md:text-xl text-muted-foreground max-w-2xl leading-relaxed animate-in fade-in slide-in-from-bottom-8 duration-1000 fill-mode-backwards delay-200">
-                    Propulse centralise vos candidatures, automatise vos
-                    relances et analyse vos performances pour vous aider à
-                    décrocher le job de vos rêves.
-                </p>
+                 
+                    <div className="overflow-hidden pb-4">
+                        {" "}
+                        <h1 className="text-5xl md:text-7xl font-bold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-primary to-purple-600 animate-in slide-in-from-bottom-full fade-in duration-1000 delay-300 fill-mode-backwards leading-[1.1]">
+                            sans chaos.
+                        </h1>
+                    </div>
+                </div>
 
-                <div className="flex flex-col sm:flex-row gap-4 w-full justify-center animate-in fade-in slide-in-from-bottom-8 duration-1000 fill-mode-backwards delay-300">
+                <div className="max-w-2xl mt-4">
+                    <TextReveal
+                        as="p"
+                        text="Propulse centralise vos candidatures, automatise vos relances et analyse vos performances pour vous aider à décrocher le job de vos rêves."
+                        className="text-lg md:text-xl text-muted-foreground justify-center leading-relaxed"
+                        delay={600}
+                    />
+                </div>
+
+                <div className="flex flex-col sm:flex-row gap-4 w-full justify-center animate-in fade-in slide-in-from-bottom-8 duration-1000 fill-mode-backwards delay-700 mt-4">
                     <Link href="/auth">
                         <Button
                             size="lg"
@@ -52,7 +66,7 @@ export default function HeroSection() {
                     </Button>
                 </div>
 
-                <div className="flex flex-wrap justify-center gap-6 mt-8 text-sm text-muted-foreground animate-in fade-in duration-1000 delay-500">
+                <div className="flex flex-wrap justify-center gap-6 mt-8 text-sm text-muted-foreground animate-in fade-in duration-1000 delay-1000">
                     <div className="flex items-center gap-2">
                         <CheckCircle2 className="w-4 h-4 text-primary" />
                         <span>Tableau de bord Kanban</span>

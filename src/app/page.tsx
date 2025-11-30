@@ -7,11 +7,15 @@ import HeroSection from "@/components/landing-page/HeroSection";
 import LandingHeader from "@/components/landing-page/LandingHeader";
 import PricingSection from "@/components/landing-page/PricingSection";
 import MouseGradientTrail from "@/components/ui/mouse-gradient-trail";
+import Noise from "@/components/ui/noise";
 import ParallaxBlob from "@/components/ui/parallax-blob";
+import RevealOnScroll from "@/components/ui/reveal-on-scroll";
 
 export default function LandingPage() {
     return (
         <div className="min-h-screen w-full bg-background relative overflow-hidden selection:bg-primary/20">
+            <Noise />
+
             <MouseGradientTrail />
 
             <ParallaxBlob
@@ -37,10 +41,21 @@ export default function LandingPage() {
             <LandingHeader />
 
             <main className="relative z-10">
-                <HeroSection />
-                <FeaturesSection />
-                <PricingSection />
-                <FinalCTASection />
+                <RevealOnScroll>
+                    <HeroSection />
+                </RevealOnScroll>
+
+                <RevealOnScroll delay={100}>
+                    <FeaturesSection />
+                </RevealOnScroll>
+
+                <RevealOnScroll delay={100}>
+                    <PricingSection />
+                </RevealOnScroll>
+
+                <RevealOnScroll delay={100}>
+                    <FinalCTASection />
+                </RevealOnScroll>
             </main>
 
             <Footer />

@@ -170,7 +170,7 @@ export default function KanbanBoard({
             onDragEnd={handleDragEnd}
         >
             <div className="flex flex-col h-full">
-                <div className="flex-1 overflow-x-auto pb-4">
+                <div className="flex-1 overflow-x-auto pb-4 no-scrollbar">
                     <div className="flex gap-6 min-w-max px-4 h-full">
                         {COLUMNS.map((column) => {
                             const columnApps = applications.filter(

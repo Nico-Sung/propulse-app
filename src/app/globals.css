@@ -31,6 +31,10 @@
     --radius-xl: calc(var(--radius) + 8px);
 }
 
+html {
+    scroll-behavior: smooth;
+}
+
 :root {
     --radius: 1rem;
 
