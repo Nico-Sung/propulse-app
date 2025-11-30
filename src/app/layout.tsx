@@ -1,11 +1,16 @@
 import { AuthProvider } from "@/contexts/AuthContext";
 import { SettingsProvider } from "@/contexts/SettingsContext";
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Plus_Jakarta_Sans } from "next/font/google"; // Nouvelle police sexy
 import { Toaster } from "sonner";
 import "./globals.css";
 
-const inter = Inter({ subsets: ["latin"] });
+// Configuration de la police
+const fontSans = Plus_Jakarta_Sans({
+    subsets: ["latin"],
+    weight: ["300", "400", "500", "600", "700", "800"],
+    variable: "--font-sans",
+});
 
 export const metadata: Metadata = {
     title: "Propulse",
@@ -19,7 +24,7 @@ export default function RootLayout({
 }) {
     return (
         <html lang="fr">
-            <body className={inter.className}>
+            <body className={`${fontSans.className} antialiased`}>
                 <AuthProvider>
                     <SettingsProvider>
                         {children}
