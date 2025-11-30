@@ -1,6 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/utils";
+import React, { useRef, useState } from "react";
 
 export default function FeatureCard({
     icon,
@@ -13,6 +14,27 @@ export default function FeatureCard({
     description: string;
     color?: string;
 }) {
+    const divRef = useRef<HTMLDivElement>(null);
+    const [position, setPosition] = useState({ x: 0, y: 0 });
+    const [opacity, setOpacity] = useState(0);
+
+    const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+        if (!divRef.current) return;
+
+        const div = divRef.current;
+        const rect = div.getBoundingClientRect();
+
+        setPosition({ x: e.clientX - rect.left, y: e.clientY - rect.top });
+    };
+
+    const handleMouseEnter = () => {
+        setOpacity(1);
+    };
+
+    const handleMouseLeave = () => {
+        setOpacity(0);
+    };
+
     const colors: Record<string, string> = {
         blue: "bg-blue-500/10 text-blue-600 dark:text-blue-400 group-hover:bg-blue-500/20",
         purple: "bg-purple-500/10 text-purple-600 dark:text-purple-400 group-hover:bg-purple-500/20",
@@ -24,25 +46,47 @@ export default function FeatureCard({
     };
 
     return (
-        <div className="group relative p-8 rounded-3xl glass-card hover:-translate-y-1 transition-all duration-300 h-full flex flex-col">
-            <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent dark:from-white/5 opacity-0 group-hover:opacity-100 rounded-3xl transition-opacity duration-500 pointer-events-none" />
+        <div
+            ref={divRef}
+            onMouseMove={handleMouseMove}
+            onMouseEnter={handleMouseEnter}
+            onMouseLeave={handleMouseLeave}
+            className="group relative p-8 rounded-3xl glass-card hover:-translate-y-1 transition-all duration-300 h-full flex flex-col overflow-hidden"
+        >
+            <div
+                className="pointer-events-none absolute -inset-px transition duration-300"
+                style={{
+                    opacity,
+                    background: `radial-gradient(600px circle at ${position.x}px ${position.y}px, rgba(255,255,255,0.1), transparent 40%)`,
+                }}
+            />
 
             <div
-                className={cn(
-                    "h-14 w-14 rounded-2xl flex items-center justify-center mb-6 transition-colors duration-300",
-                    colors[color]
-                )}
-            >
-                {icon}
+                className="pointer-events-none absolute inset-0 transition duration-300"
+                style={{
+                    opacity,
+                    background: `radial-gradient(400px circle at ${position.x}px ${position.y}px, rgba(var(--primary), 0.05), transparent 40%)`,
+                }}
+            />
+
+            <div className="relative z-10">
+                <div
+                    className={cn(
+                        "h-14 w-14 rounded-2xl flex items-center justify-center mb-6 transition-colors duration-300",
+                        colors[color]
+                    )}
+                >
+                    {icon}
+                </div>
+
+                <h3 className="text-xl font-bold text-foreground mb-3 tracking-tight">
+                    {title}
+                </h3>
+
+                <p className="text-muted-foreground leading-relaxed flex-1">
+                    {description}
+                </p>
             </div>
-
-            <h3 className="text-xl font-bold text-foreground mb-3 tracking-tight">
-                {title}
-            </h3>
-
-            <p className="text-muted-foreground leading-relaxed flex-1">
-                {description}
-            </p>
         </div>
     );
 }

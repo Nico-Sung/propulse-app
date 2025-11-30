@@ -2,15 +2,53 @@
 
 import ThemeToggle from "@/components/design-system/theme-toggle";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import Image from "next/image";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 
 export default function LandingHeader() {
+    const [isAtTop, setIsAtTop] = useState(true);
+
+    useEffect(() => {
+        const handleScroll = () => {
+            const currentScrollY = window.scrollY;
+
+            setIsAtTop(currentScrollY < 50);
+        };
+
+        window.addEventListener("scroll", handleScroll);
+        handleScroll();
+
+        return () => window.removeEventListener("scroll", handleScroll);
+    }, []);
+
     return (
-        <header className="fixed top-0 w-full z-50 px-6 py-4">
-            <div className="max-w-7xl mx-auto">
-                <div className="glass-heavy rounded-full px-6 py-3 flex items-center justify-between shadow-lg shadow-black/5 dark:shadow-black/20">
-                    <div className="flex items-center gap-3">
+        <header
+            className={cn(
+                "fixed top-0 z-50 w-full transition-all duration-500 ease-in-out",
+                isAtTop ? "p-0" : "px-4 py-4 md:px-6"
+            )}
+        >
+            <div
+                className={cn(
+                    "mx-auto transition-all duration-500 ease-in-out",
+                    isAtTop ? "max-w-full" : "max-w-7xl"
+                )}
+            >
+                <div
+                    className={cn(
+                        "flex items-center justify-between transition-all duration-500 relative overflow-hidden border",
+                        isAtTop
+                            ? "w-full rounded-none border-x-0 border-t-0 px-8 py-4"
+                            : "rounded-full px-6 py-3",
+
+                        isAtTop
+                            ? "bg-white/30 dark:bg-black/20 backdrop-blur-md border-white/20 dark:border-white/10" // Style transparent/léger
+                            : "bg-white/80 dark:bg-zinc-950/80 backdrop-blur-xl border-white/40 dark:border-white/20 shadow-xl shadow-black/10 dark:shadow-black/40" // Style solide/flottant
+                    )}
+                >
+                    <div className="flex items-center gap-3 relative z-10">
                         <div className="relative h-8 w-8 bg-gradient-to-br from-primary to-purple-600 rounded-lg flex items-center justify-center shadow-md">
                             <Image
                                 src="/logo.png"
@@ -25,7 +63,7 @@ export default function LandingHeader() {
                         </span>
                     </div>
 
-                    <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-muted-foreground">
+                    <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-muted-foreground relative z-10">
                         <a
                             href="#features"
                             className="hover:text-primary transition-colors"
@@ -49,7 +87,7 @@ export default function LandingHeader() {
                         </a>
                     </nav>
 
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-3 relative z-10">
                         <ThemeToggle className="hidden sm:flex rounded-full hover:bg-black/5" />
                         <Link href="/auth">
                             <Button
