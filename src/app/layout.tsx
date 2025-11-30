@@ -20,8 +20,8 @@ export default function RootLayout({
     return (
         <html lang="fr">
             <body className={inter.className}>
-                <SettingsProvider>
-                    <AuthProvider>
+                <AuthProvider>
+                    <SettingsProvider>
                         {children}
                         <Toaster
                             position="bottom-right"
@@ -39,8 +39,8 @@ export default function RootLayout({
                                 },
                             }}
                         />
-                    </AuthProvider>
-                </SettingsProvider>
+                    </SettingsProvider>
+                </AuthProvider>
             </body>
         </html>
     );

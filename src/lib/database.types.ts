@@ -9,6 +9,40 @@ export type Json =
 export interface Database {
     public: {
         Tables: {
+            user_preferences: {
+                Row: {
+                    user_id: string;
+                    theme: "light" | "dark";
+                    view_mode: "normal" | "compact";
+                    kanban_sort: "date_desc" | "date_asc" | "name_asc";
+                    created_at: string;
+                    updated_at: string;
+                };
+                Insert: {
+                    user_id: string;
+                    theme?: "light" | "dark";
+                    view_mode?: "normal" | "compact";
+                    kanban_sort?: "date_desc" | "date_asc" | "name_asc";
+                    created_at?: string;
+                    updated_at?: string;
+                };
+                Update: {
+                    user_id?: string;
+                    theme?: "light" | "dark";
+                    view_mode?: "normal" | "compact";
+                    kanban_sort?: "date_desc" | "date_asc" | "name_asc";
+                    created_at?: string;
+                    updated_at?: string;
+                };
+                Relationships: [
+                    {
+                        foreignKeyName: "user_preferences_user_id_fkey";
+                        columns: ["user_id"];
+                        referencedRelation: "users";
+                        referencedColumns: ["id"];
+                    }
+                ];
+            };
             tags: {
                 Row: {
                     id: string;

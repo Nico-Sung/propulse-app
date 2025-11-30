@@ -39,26 +39,22 @@ export default function KanbanBoard({
 }: {
     initialApplications?: Application[];
 }) {
+    const { user } = useAuth();
+
     const [applications, setApplications] = useState<Application[]>(
         initialApplications || []
     );
     const [loading, setLoading] = useState(true);
-    const { user } = useAuth();
 
     const tagsData = useKanbanTags();
-    const { viewMode, setViewMode } = useSettings();
+    const { viewMode, setViewMode, kanbanSort, setKanbanSort } = useSettings();
 
-    const [sortOption, setSortOption] = useState<SortOption>("date_desc");
-
-    useEffect(() => {
-        const savedSort = localStorage.getItem("kanban_sort");
-        if (savedSort) setSortOption(savedSort as SortOption);
-    }, []);
-
-    const handleSortChange = (option: SortOption) => {
-        setSortOption(option);
-        localStorage.setItem("kanban_sort", option);
-    };
+    const [activeId, setActiveId] = useState<UniqueIdentifier | null>(null);
+    const [selectedApplication, setSelectedApplication] =
+        useState<Application | null>(null);
+    const [isSheetOpen, setIsSheetOpen] = useState(false);
+    const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+    const [defaultStatus, setDefaultStatus] = useState<string>("to_apply");
 
     const sensors = useSensors(
         useSensor(PointerSensor, { activationConstraint: { distance: 8 } })
@@ -74,17 +70,10 @@ export default function KanbanBoard({
             .from("applications")
             .select("*")
             .order("created_at", { ascending: false });
+
         if (!error && data) setApplications(data as Application[]);
         setLoading(false);
     };
-
-    const [activeId, setActiveId] = useState<UniqueIdentifier | null>(null);
-    const [selectedApplication, setSelectedApplication] =
-        useState<Application | null>(null);
-    const [isSheetOpen, setIsSheetOpen] = useState(false);
-
-    const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-    const [defaultStatus, setDefaultStatus] = useState<string>("to_apply");
 
     const handleOpenAddModal = (status: string) => {
         setDefaultStatus(status);
@@ -120,13 +109,15 @@ export default function KanbanBoard({
         if (prevApp.status === newStatus) return;
 
         setApplications((prev) => {
-            const without = prev.filter((p) => p.id !== activeId);
-            const moved = {
-                ...prev.find((p) => p.id === activeId)!,
-                status: newStatus,
-                updated_at: new Date().toISOString(),
-            } as Application;
-            return [moved, ...without];
+            return prev.map((app) =>
+                app.id === activeId
+                    ? {
+                          ...app,
+                          status: newStatus!,
+                          updated_at: new Date().toISOString(),
+                      }
+                    : app
+            );
         });
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -155,20 +146,21 @@ export default function KanbanBoard({
             });
         } else {
             await loadApplications();
+            console.error("Erreur lors du déplacement", error);
         }
     };
-
-    if (loading) {
-        return (
-            <div className="flex items-center justify-center h-screen">
-                <Spinner size={48} />
-            </div>
-        );
-    }
 
     const activeApplication = applications.find(
         (a) => String(a.id) === String(activeId)
     );
+
+    if (loading) {
+        return (
+            <div className="flex items-center justify-center h-[calc(100vh-100px)]">
+                <Spinner size={48} />
+            </div>
+        );
+    }
 
     return (
         <DndContext
@@ -177,20 +169,23 @@ export default function KanbanBoard({
             onDragStart={handleDragStart}
             onDragEnd={handleDragEnd}
         >
-            <div className=" flex flex-col ">
-                <div className="flex-1 overflow-x-auto p-6">
-                    <div className="flex gap-4 min-w-max">
+            <div className="flex flex-col h-full">
+                <div className="flex-1 overflow-x-auto pb-4">
+                    <div className="flex gap-6 min-w-max px-4 h-full">
                         {COLUMNS.map((column) => {
                             const columnApps = applications.filter(
                                 (app) => app.status === column.id
                             );
+
                             return (
                                 <KanbanColumn
                                     key={column.id}
                                     column={column}
                                     applications={columnApps}
-                                    sortOption={sortOption}
-                                    onSortChange={handleSortChange}
+                                    sortOption={kanbanSort || "date_desc"}
+                                    onSortChange={(val: SortOption) =>
+                                        setKanbanSort(val)
+                                    }
                                     viewMode={viewMode}
                                     onViewModeChange={setViewMode}
                                     onCardClick={(app) => {
@@ -221,6 +216,7 @@ export default function KanbanBoard({
                         await loadApplications();
                     }}
                 />
+
                 <DragOverlay>
                     {activeApplication ? (
                         <OverlayCard
