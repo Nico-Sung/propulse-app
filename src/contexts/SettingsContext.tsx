@@ -10,9 +10,10 @@ import React, {
     useEffect,
     useState,
 } from "react";
+
 type Theme = "light" | "dark";
 type ViewMode = "normal" | "compact";
-type KanbanSort = "date_desc" | "date_asc" | "name_asc";
+type KanbanSort = "date_desc" | "date_asc" | "name_asc" | "manual";
 
 type UserPreference = Database["public"]["Tables"]["user_preferences"]["Row"];
 
@@ -67,7 +68,7 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
                     setShowHistoryState(prefs.show_history ?? false);
                     setShowFollowUpsState(prefs.show_follow_ups ?? true);
                 } else if (!error) {
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    //eslint-disable-next-line @typescript-eslint/no-explicit-any
                     await (supabase as any).from("user_preferences").insert({
                         user_id: user.id,
                         theme: "light",
@@ -76,11 +77,6 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
                         show_history: false,
                         show_follow_ups: true,
                     });
-                } else {
-                    console.error(
-                        "Erreur lors du chargement des préférences",
-                        error
-                    );
                 }
             } catch (err) {
                 console.error("Erreur chargement préférences:", err);

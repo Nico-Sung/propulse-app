@@ -13,25 +13,14 @@ import {
     ContextMenuSubTrigger,
     ContextMenuTrigger,
 } from "@/components/ui/context-menu";
-import {
-    DropdownMenu,
-    DropdownMenuCheckboxItem,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
-    DropdownMenuSub,
-    DropdownMenuSubContent,
-    DropdownMenuSubTrigger,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { useKanbanTags } from "@/hooks/useKanbanTags";
 import { Database } from "@/lib/database.types";
+import { SortOption, sortApplications } from "@/lib/kanban-utils";
 import { cn } from "@/lib/utils";
 import { useDroppable } from "@dnd-kit/core";
 import { SortableContext, rectSortingStrategy } from "@dnd-kit/sortable";
 import {
-    MoreHorizontal,
+    Move,
     Palette,
     Plus,
     PlusCircle,
@@ -40,10 +29,9 @@ import {
 } from "lucide-react";
 import { useMemo } from "react";
 import { ApplicationCard } from "./card/ApplicationCard";
+import { ColumnHeader } from "./column/ColumnHeader";
 
 type Application = Database["public"]["Tables"]["applications"]["Row"];
-
-export type SortOption = "date_desc" | "date_asc" | "name_asc";
 export type ViewMode = "normal" | "compact";
 
 interface KanbanColumnProps {
@@ -71,29 +59,10 @@ export function KanbanColumn({
 }: KanbanColumnProps) {
     const { setNodeRef, isOver } = useDroppable({ id: column.id });
 
-    const sortedApplications = useMemo(() => {
-        const apps = [...applications];
-        switch (sortOption) {
-            case "date_desc":
-                return apps.sort(
-                    (a, b) =>
-                        new Date(b.created_at).getTime() -
-                        new Date(a.created_at).getTime()
-                );
-            case "date_asc":
-                return apps.sort(
-                    (a, b) =>
-                        new Date(a.created_at).getTime() -
-                        new Date(b.created_at).getTime()
-                );
-            case "name_asc":
-                return apps.sort((a, b) =>
-                    a.company_name.localeCompare(b.company_name)
-                );
-            default:
-                return apps;
-        }
-    }, [applications, sortOption]);
+    const sortedApplications = useMemo(
+        () => sortApplications(applications, sortOption),
+        [applications, sortOption]
+    );
 
     const sortedIds = useMemo(
         () => sortedApplications.map((app) => app.id),
@@ -144,110 +113,19 @@ export function KanbanColumn({
 
     return (
         <div className="flex flex-col w-80 h-full shrink-0">
-            <div className="flex items-center justify-between px-3 mb-3">
-                <div className="flex items-center gap-2">
-                    <h3 className="font-bold text-sm text-foreground/80 tracking-tight">
-                        {column.label}
-                    </h3>
-                    <span
-                        className={cn(
-                            "text-[10px] font-bold px-2 py-0.5 rounded-full backdrop-blur-sm",
-                            badgeColorMap[column.id] ||
-                                "bg-muted text-muted-foreground"
-                        )}
-                    >
-                        {applications.length}
-                    </span>
-                </div>
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-6 w-6 text-muted-foreground hover:text-foreground"
-                        >
-                            <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-56">
-                        <DropdownMenuLabel>
-                            Options de colonne
-                        </DropdownMenuLabel>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem onClick={onAddApplication}>
-                            <PlusCircle className="mr-2 h-4 w-4" />
-                            Ajouter une carte
-                        </DropdownMenuItem>
-
-                        <DropdownMenuSub>
-                            <DropdownMenuSubTrigger>
-                                <SortAsc className="mr-2 h-4 w-4" />
-                                Trier par...
-                            </DropdownMenuSubTrigger>
-                            <DropdownMenuSubContent>
-                                <DropdownMenuCheckboxItem
-                                    checked={sortOption === "date_desc"}
-                                    onCheckedChange={() =>
-                                        onSortChange("date_desc")
-                                    }
-                                >
-                                    Date d&apos;ajout (Récent)
-                                </DropdownMenuCheckboxItem>
-                                <DropdownMenuCheckboxItem
-                                    checked={sortOption === "date_asc"}
-                                    onCheckedChange={() =>
-                                        onSortChange("date_asc")
-                                    }
-                                >
-                                    Date d&apos;ajout (Ancien)
-                                </DropdownMenuCheckboxItem>
-                                <DropdownMenuCheckboxItem
-                                    checked={sortOption === "name_asc"}
-                                    onCheckedChange={() =>
-                                        onSortChange("name_asc")
-                                    }
-                                >
-                                    Nom (A-Z)
-                                </DropdownMenuCheckboxItem>
-                            </DropdownMenuSubContent>
-                        </DropdownMenuSub>
-
-                        <DropdownMenuSub>
-                            <DropdownMenuSubTrigger>
-                                <Palette className="mr-2 h-4 w-4" />
-                                Apparence
-                            </DropdownMenuSubTrigger>
-                            <DropdownMenuSubContent>
-                                <DropdownMenuCheckboxItem
-                                    checked={viewMode === "normal"}
-                                    onCheckedChange={() =>
-                                        onViewModeChange("normal")
-                                    }
-                                >
-                                    Mode Normal
-                                </DropdownMenuCheckboxItem>
-                                <DropdownMenuCheckboxItem
-                                    checked={viewMode === "compact"}
-                                    onCheckedChange={() =>
-                                        onViewModeChange("compact")
-                                    }
-                                >
-                                    Mode Compact
-                                </DropdownMenuCheckboxItem>
-                            </DropdownMenuSubContent>
-                        </DropdownMenuSub>
-
-                        <DropdownMenuSeparator />
-
-                        <DropdownMenuItem
-                            onClick={() => window.location.reload()}
-                        >
-                            <RotateCw className="mr-2 h-4 w-4" />
-                            Rafraîchir la liste
-                        </DropdownMenuItem>
-                    </DropdownMenuContent>
-                </DropdownMenu>
-            </div>
+            <ColumnHeader
+                label={column.label}
+                count={applications.length}
+                badgeColor={
+                    badgeColorMap[column.id] || "bg-muted text-muted-foreground"
+                }
+                sortOption={sortOption}
+                onSortChange={onSortChange}
+                viewMode={viewMode}
+                onViewModeChange={onViewModeChange}
+                onAdd={onAddApplication}
+                onRefresh={() => window.location.reload()}
+            />
 
             <ContextMenu>
                 <ContextMenuTrigger className="flex flex-col">
@@ -315,25 +193,30 @@ export function KanbanColumn({
                         </ContextMenuSubTrigger>
                         <ContextMenuSubContent className="bg-white/95 dark:bg-zinc-900/95 backdrop-blur-xl border border-white/20 shadow-xl p-1">
                             <ContextMenuCheckboxItem
+                                checked={sortOption === "manual"}
+                                onCheckedChange={() => onSortChange("manual")}
+                            >
+                                <Move className="mr-2 h-3 w-3" />
+                                Manuel (Drag & Drop)
+                            </ContextMenuCheckboxItem>
+                            <ContextMenuSeparator />
+                            <ContextMenuCheckboxItem
                                 checked={sortOption === "date_desc"}
                                 onCheckedChange={() =>
                                     onSortChange("date_desc")
                                 }
-                                className="rounded-md focus:bg-primary/10 focus:text-primary"
                             >
                                 Date d&apos;ajout (Récent)
                             </ContextMenuCheckboxItem>
                             <ContextMenuCheckboxItem
                                 checked={sortOption === "date_asc"}
                                 onCheckedChange={() => onSortChange("date_asc")}
-                                className="rounded-md focus:bg-primary/10 focus:text-primary"
                             >
                                 Date d&apos;ajout (Ancien)
                             </ContextMenuCheckboxItem>
                             <ContextMenuCheckboxItem
                                 checked={sortOption === "name_asc"}
                                 onCheckedChange={() => onSortChange("name_asc")}
-                                className="rounded-md focus:bg-primary/10 focus:text-primary"
                             >
                                 Nom (A-Z)
                             </ContextMenuCheckboxItem>
@@ -353,7 +236,6 @@ export function KanbanColumn({
                                 onCheckedChange={() =>
                                     onViewModeChange("normal")
                                 }
-                                className="rounded-md focus:bg-primary/10 focus:text-primary"
                             >
                                 Mode Normal
                             </ContextMenuCheckboxItem>
@@ -362,7 +244,6 @@ export function KanbanColumn({
                                 onCheckedChange={() =>
                                     onViewModeChange("compact")
                                 }
-                                className="rounded-md focus:bg-primary/10 focus:text-primary"
                             >
                                 Mode Compact
                             </ContextMenuCheckboxItem>

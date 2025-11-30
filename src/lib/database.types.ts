@@ -14,7 +14,11 @@ export interface Database {
                     user_id: string;
                     theme: "light" | "dark";
                     view_mode: "normal" | "compact";
-                    kanban_sort: "date_desc" | "date_asc" | "name_asc";
+                    kanban_sort:
+                        | "date_desc"
+                        | "date_asc"
+                        | "name_asc"
+                        | "manual";
                     show_history: boolean;
                     show_follow_ups?: boolean;
                     created_at: string;
@@ -24,7 +28,11 @@ export interface Database {
                     user_id: string;
                     theme?: "light" | "dark";
                     view_mode?: "normal" | "compact";
-                    kanban_sort?: "date_desc" | "date_asc" | "name_asc";
+                    kanban_sort?:
+                        | "date_desc"
+                        | "date_asc"
+                        | "name_asc"
+                        | "manual";
                     show_history?: boolean;
                     show_follow_ups?: boolean;
                     created_at?: string;
@@ -34,7 +42,11 @@ export interface Database {
                     user_id?: string;
                     theme?: "light" | "dark";
                     view_mode?: "normal" | "compact";
-                    kanban_sort?: "date_desc" | "date_asc" | "name_asc";
+                    kanban_sort?:
+                        | "date_desc"
+                        | "date_asc"
+                        | "name_asc"
+                        | "manual";
                     show_history?: boolean;
                     show_follow_ups?: boolean;
                     created_at?: string;
@@ -147,6 +159,7 @@ export interface Database {
                     deadline: string | null;
                     interview_date: string | null;
                     salary_range: string;
+                    position: number;
                     created_at: string;
                     updated_at: string;
                 };
@@ -171,6 +184,7 @@ export interface Database {
                     deadline?: string | null;
                     interview_date?: string | null;
                     salary_range?: string;
+                    position?: number;
                     created_at?: string;
                     updated_at?: string;
                 };
@@ -195,6 +209,7 @@ export interface Database {
                     deadline?: string | null;
                     interview_date?: string | null;
                     salary_range?: string;
+                    position?: number;
                     created_at?: string;
                     updated_at?: string;
                 };
