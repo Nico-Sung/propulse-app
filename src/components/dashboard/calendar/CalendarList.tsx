@@ -1,9 +1,9 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { useSettings } from "@/hooks/useSettings";
 import { cn } from "@/lib/utils";
 import { Calendar as CalendarIcon, Clock, History } from "lucide-react";
-import { useState } from "react";
 import CalendarDay from "./CalendarDay";
 import { CalendarEvent } from "./CalendarEventItem";
 
@@ -12,15 +12,14 @@ export default function CalendarList({
 }: {
     grouped: Record<string, CalendarEvent[]>;
 }) {
-    const [showPast, setShowPast] = useState(false);
+    const { showHistory, setShowHistory } = useSettings();
 
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    
     const sortedKeys = Object.keys(grouped)
         .filter((dateKey) => {
-            if (showPast) return true;
+            if (showHistory) return true;
 
             const [day, month, year] = dateKey.split("/").map(Number);
             const eventDate = new Date(year, month - 1, day);
@@ -46,21 +45,21 @@ export default function CalendarList({
                 <Button
                     variant="ghost"
                     size="sm"
-                    onClick={() => setShowPast(!showPast)}
+                    onClick={() => setShowHistory(!showHistory)}
                     className={cn(
                         "text-xs font-medium gap-2 transition-all",
-                        showPast
+                        showHistory
                             ? "text-primary bg-primary/10 hover:bg-primary/20"
                             : "text-muted-foreground hover:text-foreground"
                     )}
                 >
-                    {showPast ? (
+                    {showHistory ? (
                         <History className="w-4 h-4" />
                     ) : (
                         <Clock className="w-4 h-4" />
                     )}
-                    {showPast ? "Masquer le passé" : "Voir l'historique"}
-                    {!showPast && hiddenCount > 0 && (
+                    {showHistory ? "Masquer le passé" : "Voir l'historique"}
+                    {!showHistory && hiddenCount > 0 && (
                         <span className="ml-1 bg-muted text-muted-foreground px-1.5 py-0.5 rounded-full text-[10px]">
                             {hiddenCount}
                         </span>
@@ -74,10 +73,10 @@ export default function CalendarList({
                         <CalendarIcon className="h-10 w-10 text-muted-foreground" />
                     </div>
                     <h3 className="text-xl font-semibold text-foreground">
-                        {showPast ? "Aucun événement" : "Rien à venir"}
+                        {showHistory ? "Aucun événement" : "Rien à venir"}
                     </h3>
                     <p className="text-muted-foreground mt-2 max-w-sm">
-                        {showPast
+                        {showHistory
                             ? "Votre agenda est vide."
                             : 'Aucun entretien ou date limite à venir. Cliquez sur "Voir l\'historique" pour consulter le passé.'}
                     </p>

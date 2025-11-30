@@ -15,6 +15,8 @@ export interface Database {
                     theme: "light" | "dark";
                     view_mode: "normal" | "compact";
                     kanban_sort: "date_desc" | "date_asc" | "name_asc";
+                    show_history: boolean;
+                    show_follow_ups?: boolean;
                     created_at: string;
                     updated_at: string;
                 };
@@ -23,6 +25,8 @@ export interface Database {
                     theme?: "light" | "dark";
                     view_mode?: "normal" | "compact";
                     kanban_sort?: "date_desc" | "date_asc" | "name_asc";
+                    show_history?: boolean;
+                    show_follow_ups?: boolean;
                     created_at?: string;
                     updated_at?: string;
                 };
@@ -31,6 +35,8 @@ export interface Database {
                     theme?: "light" | "dark";
                     view_mode?: "normal" | "compact";
                     kanban_sort?: "date_desc" | "date_asc" | "name_asc";
+                    show_history?: boolean;
+                    show_follow_ups?: boolean;
                     created_at?: string;
                     updated_at?: string;
                 };

@@ -10,8 +10,6 @@ import React, {
     useEffect,
     useState,
 } from "react";
-import { toast } from "sonner";
-
 type Theme = "light" | "dark";
 type ViewMode = "normal" | "compact";
 type KanbanSort = "date_desc" | "date_asc" | "name_asc";
@@ -26,6 +24,10 @@ interface SettingsContextType {
     setViewMode: (mode: ViewMode) => void;
     kanbanSort: KanbanSort;
     setKanbanSort: (sort: KanbanSort) => void;
+    showHistory: boolean;
+    setShowHistory: (show: boolean) => void;
+    showFollowUps: boolean;
+    setShowFollowUps: (show: boolean) => void;
     loading: boolean;
 }
 
@@ -39,6 +41,8 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
     const [theme, setThemeState] = useState<Theme>("light");
     const [viewMode, setViewModeState] = useState<ViewMode>("normal");
     const [kanbanSort, setKanbanSortState] = useState<KanbanSort>("date_desc");
+    const [showHistory, setShowHistoryState] = useState(false);
+    const [showFollowUps, setShowFollowUpsState] = useState(true);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -60,6 +64,8 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
                         setViewModeState(prefs.view_mode as ViewMode);
                     if (prefs.kanban_sort)
                         setKanbanSortState(prefs.kanban_sort as KanbanSort);
+                    setShowHistoryState(prefs.show_history ?? false);
+                    setShowFollowUpsState(prefs.show_follow_ups ?? true);
                 } else if (!error) {
                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
                     await (supabase as any).from("user_preferences").insert({
@@ -67,6 +73,8 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
                         theme: "light",
                         view_mode: "normal",
                         kanban_sort: "date_desc",
+                        show_history: false,
+                        show_follow_ups: true,
                     });
                 } else {
                     console.error(
@@ -114,7 +122,6 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
                 if (error) throw error;
             } catch (err) {
                 console.error(`Erreur sauvegarde ${key}:`, err);
-                toast.error("Erreur de sauvegarde des préférences");
             }
         },
         [user]
@@ -140,6 +147,16 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
         savePreference("kanban_sort", newSort);
     };
 
+    const setShowHistory = (show: boolean) => {
+        setShowHistoryState(show);
+        savePreference("show_history", show);
+    };
+
+    const setShowFollowUps = (show: boolean) => {
+        setShowFollowUpsState(show);
+        savePreference("show_follow_ups", show);
+    };
+
     return (
         <SettingsContext.Provider
             value={{
@@ -150,6 +167,10 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
                 setViewMode,
                 kanbanSort,
                 setKanbanSort,
+                showHistory,
+                setShowHistory,
+                showFollowUps,
+                setShowFollowUps,
                 loading,
             }}
         >

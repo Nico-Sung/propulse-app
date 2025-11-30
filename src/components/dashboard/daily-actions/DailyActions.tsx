@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/button";
 import Spinner from "@/components/ui/Spinner";
 import { useAuth } from "@/contexts/AuthContext";
+import { useSettings } from "@/hooks/useSettings";
 import type { Database } from "@/lib/database.types";
 import { supabase } from "@/lib/supabaseClient";
 import { cn } from "@/lib/utils";
@@ -14,9 +15,8 @@ import { DailyActionsList } from "./DailyActionsList";
 type Application = Database["public"]["Tables"]["applications"]["Row"];
 type Task = Database["public"]["Tables"]["tasks"]["Row"];
 
-
 interface TaskWithApplication extends Task {
-    applications: Application | null; 
+    applications: Application | null;
 }
 
 export interface DailyAction {
@@ -35,7 +35,9 @@ export default function DailyActions({
 }) {
     const [actions, setActions] = useState<DailyAction[]>(initialActions || []);
     const [loading, setLoading] = useState(true);
-    const [hideFollowUps, setHideFollowUps] = useState(false);
+
+    const { showFollowUps, setShowFollowUps } = useSettings();
+
     const { user } = useAuth();
 
     useEffect(() => {
@@ -177,7 +179,7 @@ export default function DailyActions({
     };
 
     const filteredActions = actions.filter((action) => {
-        if (hideFollowUps && action.type === "follow_up") return false;
+        if (!showFollowUps && action.type === "follow_up") return false;
         return true;
     });
 
@@ -219,23 +221,23 @@ export default function DailyActions({
                         <Button
                             variant="ghost"
                             size="sm"
-                            onClick={() => setHideFollowUps(!hideFollowUps)}
+                            onClick={() => setShowFollowUps(!showFollowUps)}
                             className={cn(
                                 "text-xs font-medium gap-2 transition-all h-8",
-                                hideFollowUps
+                                !showFollowUps
                                     ? "text-primary bg-primary/10 hover:bg-primary/20"
                                     : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
                             )}
                         >
-                            {hideFollowUps ? (
+                            {!showFollowUps ? (
                                 <Eye className="w-3.5 h-3.5" />
                             ) : (
                                 <EyeOff className="w-3.5 h-3.5" />
                             )}
-                            {hideFollowUps
+                            {!showFollowUps
                                 ? "Afficher les relances"
                                 : "Masquer les relances"}
-                            {hideFollowUps && hiddenCount > 0 && (
+                            {!showFollowUps && hiddenCount > 0 && (
                                 <span className="ml-1 bg-background/50 px-1.5 py-0.5 rounded-full text-[10px] shadow-sm">
                                     +{hiddenCount}
                                 </span>
