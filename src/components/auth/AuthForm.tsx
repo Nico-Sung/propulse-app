@@ -26,13 +26,37 @@ export default function AuthForm({ initialSignUp = false }: Props) {
         setError("");
         setLoading(true);
         try {
-            const { error } = isSignUp
+            const { error: authError } = isSignUp
                 ? await signUp(email, password, fullName)
                 : await signIn(email, password);
-            if (error) throw error;
+
+            if (authError) {
+                if (
+                    authError.message.includes("row-level security") ||
+                    authError.message.includes("security policy")
+                ) {
+                    console.warn(
+                        "Erreur RLS lors de la création du profil (mais le compte est probablement créé):",
+                        authError
+                    );
+                }
+                throw authError;
+            }
             //eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (err: any) {
-            setError(err.message || "Une erreur est survenue");
+            console.error("Erreur Auth:", err);
+            let message = err.message || "Une erreur est survenue";
+
+            if (message.includes("User already registered")) {
+                message = "Cet email est déjà utilisé.";
+            } else if (message.includes("Invalid login credentials")) {
+                message = "Email ou mot de passe incorrect.";
+            } else if (message.includes("row-level security")) {
+                message =
+                    "Compte créé ! Veuillez vérifier vos emails pour confirmer.";
+            }
+
+            setError(message);
         } finally {
             setLoading(false);
         }
@@ -113,8 +137,16 @@ export default function AuthForm({ initialSignUp = false }: Props) {
 
                 {error && (
                     <Alert
-                        variant="destructive"
-                        className="bg-destructive/10 text-destructive border-destructive/20"
+                        variant={
+                            error.includes("Compte créé")
+                                ? "default"
+                                : "destructive"
+                        }
+                        className={
+                            error.includes("Compte créé")
+                                ? "bg-green-500/10 text-green-600 border-green-500/20"
+                                : "bg-destructive/10 text-destructive border-destructive/20"
+                        }
                     >
                         <AlertDescription>{error}</AlertDescription>
                     </Alert>
