@@ -5,12 +5,29 @@ import Spinner from "@/components/ui/Spinner";
 import { useAuth } from "@/contexts/AuthContext";
 import { Database } from "@/lib/database.types";
 import { supabase } from "@/lib/supabaseClient";
+import {
+    closestCenter,
+    DndContext,
+    DragEndEvent,
+    DragOverlay,
+    DragStartEvent,
+    PointerSensor,
+    TouchSensor,
+    useSensor,
+    useSensors,
+} from "@dnd-kit/core";
+import {
+    arrayMove,
+    rectSortingStrategy,
+    SortableContext,
+} from "@dnd-kit/sortable";
 import { FileText } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { DocumentCard } from "../dashboard/documents/DocumentCard";
 import { DocumentPreviewModal } from "../dashboard/documents/DocumentPreviewModal";
 import { DocumentUploadModal } from "../dashboard/documents/DocumentUploadModal";
+import { SortableDocumentCard } from "../dashboard/documents/SortableDocumentCard";
 
 type Document = Database["public"]["Tables"]["documents"]["Row"];
 
@@ -21,6 +38,14 @@ export default function DocumentsView() {
 
     const [previewDoc, setPreviewDoc] = useState<Document | null>(null);
     const [deleteDoc, setDeleteDoc] = useState<Document | null>(null);
+    const [activeId, setActiveId] = useState<string | null>(null);
+
+    const sensors = useSensors(
+        useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
+        useSensor(TouchSensor, {
+            activationConstraint: { delay: 250, tolerance: 5 },
+        })
+    );
 
     useEffect(() => {
         if (user) loadDocuments();
@@ -28,11 +53,15 @@ export default function DocumentsView() {
 
     const loadDocuments = async () => {
         setLoading(true);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const { data } = await (supabase as any)
+        const { data, error } = await supabase
             .from("documents")
             .select("*")
+            .order("position", { ascending: true })
             .order("created_at", { ascending: false });
+
+        if (error) {
+            console.error("Erreur chargement documents:", error);
+        }
 
         if (data) setDocuments(data as Document[]);
         setLoading(false);
@@ -41,8 +70,7 @@ export default function DocumentsView() {
     const handleDelete = async () => {
         if (!deleteDoc) return;
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const { error } = await (supabase as any)
+        const { error } = await supabase
             .from("documents")
             .delete()
             .eq("id", deleteDoc.id);
@@ -57,7 +85,56 @@ export default function DocumentsView() {
         setDeleteDoc(null);
     };
 
-    if (loading) {
+    const handleDragStart = (event: DragStartEvent) => {
+        setActiveId(event.active.id as string);
+    };
+
+    const handleDragEnd = async (event: DragEndEvent) => {
+        const { active, over } = event;
+        setActiveId(null);
+
+        if (!over || active.id === over.id || !user) return;
+
+        const oldIndex = documents.findIndex((doc) => doc.id === active.id);
+        const newIndex = documents.findIndex((doc) => doc.id === over.id);
+
+        if (oldIndex !== -1 && newIndex !== -1) {
+            const newOrder = arrayMove(documents, oldIndex, newIndex);
+
+            setDocuments(newOrder);
+
+            const updates = newOrder.map((doc, index) => ({
+                ...doc,
+                user_id: user.id,
+                position: index,
+            }));
+
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const { error } = await (supabase as any)
+                .from("documents")
+                .upsert(updates, { onConflict: "id" });
+
+            if (error) {
+                console.error("Erreur lors de la réorganisation:", error);
+
+                if (error.code === "42501") {
+                    toast.error(
+                        "Erreur de permissions. Vérifiez la politique RLS."
+                    );
+                } else if (error.code === "23502") {
+                    toast.error("Données incomplètes pour la mise à jour.");
+                } else {
+                    toast.error("Erreur lors de la sauvegarde de l'ordre");
+                }
+
+                loadDocuments();
+            }
+        }
+    };
+
+    const activeDocument = documents.find((doc) => doc.id === activeId);
+
+    if (loading && documents.length === 0) {
         return (
             <div className="flex items-center justify-center h-screen">
                 <Spinner size={48} />
@@ -73,7 +150,8 @@ export default function DocumentsView() {
                         Documents
                     </h2>
                     <p className="text-muted-foreground text-lg">
-                        Centralisez vos CVs et lettres de motivation.
+                        Centralisez et organisez vos CVs et lettres de
+                        motivation.
                     </p>
                 </div>
                 <DocumentUploadModal onUploadComplete={loadDocuments} />
@@ -94,16 +172,39 @@ export default function DocumentsView() {
                     <DocumentUploadModal onUploadComplete={loadDocuments} />
                 </div>
             ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 content-start items-start w-full">
-                    {documents.map((doc) => (
-                        <DocumentCard
-                            key={doc.id}
-                            doc={doc}
-                            onPreview={() => setPreviewDoc(doc)}
-                            onDelete={() => setDeleteDoc(doc)}
-                        />
-                    ))}
-                </div>
+                <DndContext
+                    sensors={sensors}
+                    collisionDetection={closestCenter}
+                    onDragStart={handleDragStart}
+                    onDragEnd={handleDragEnd}
+                >
+                    <SortableContext
+                        items={documents.map((d) => d.id)}
+                        strategy={rectSortingStrategy}
+                    >
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 content-start items-start w-full">
+                            {documents.map((doc) => (
+                                <SortableDocumentCard
+                                    key={doc.id}
+                                    doc={doc}
+                                    onPreview={() => setPreviewDoc(doc)}
+                                    onDelete={() => setDeleteDoc(doc)}
+                                />
+                            ))}
+                        </div>
+                    </SortableContext>
+
+                    <DragOverlay>
+                        {activeDocument ? (
+                            <div className="scale-105 rotate-2 cursor-grabbing">
+                                <DocumentCard
+                                    doc={activeDocument}
+                                    onPreview={() => {}}
+                                />
+                            </div>
+                        ) : null}
+                    </DragOverlay>
+                </DndContext>
             )}
 
             {previewDoc && (

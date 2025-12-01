@@ -234,6 +234,7 @@ export interface Database {
                     keywords_found: string[];
                     keywords_missing: string[];
                     match_percentage: number;
+                    position: number;
                     created_at: string;
                 };
                 Insert: {
@@ -247,6 +248,7 @@ export interface Database {
                     keywords_found?: string[];
                     keywords_missing?: string[];
                     match_percentage?: number;
+                    position?: number;
                     created_at?: string;
                 };
                 Update: {
@@ -260,6 +262,7 @@ export interface Database {
                     keywords_found?: string[];
                     keywords_missing?: string[];
                     match_percentage?: number;
+                    position?: number;
                     created_at?: string;
                 };
                 Relationships: [
