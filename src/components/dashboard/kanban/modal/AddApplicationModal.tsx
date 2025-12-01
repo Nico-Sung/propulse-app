@@ -1,15 +1,16 @@
 "use client";
 
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
     Dialog,
     DialogContent,
+    DialogDescription,
     DialogHeader,
     DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog";
 import { Plus } from "lucide-react";
+import { useState } from "react";
 import AddApplicationForm from "./AddApplicationForm";
 
 interface AddApplicationDialogProps {
@@ -42,6 +43,10 @@ export function AddApplicationDialog({
             <DialogContent className="sm:max-w-[650px]">
                 <DialogHeader>
                     <DialogTitle>Ajouter une Candidature</DialogTitle>
+                    <DialogDescription className="text-muted-foreground">
+                        Remplissez les informations ci-dessous pour suivre une
+                        nouvelle offre d&apos;emploi.
+                    </DialogDescription>
                 </DialogHeader>
                 <div className="py-4">
                     <AddApplicationForm

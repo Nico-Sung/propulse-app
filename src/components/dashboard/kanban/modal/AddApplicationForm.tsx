@@ -1,21 +1,7 @@
 "use client";
 
-import React, { useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { supabase } from "@/lib/supabaseClient";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select";
+import { CompanyAutocomplete } from "@/components/ui/company-autocomplete";
 import {
     Form,
     FormControl,
@@ -24,7 +10,23 @@ import {
     FormLabel,
     FormMessage,
 } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { JobAutocomplete } from "@/components/ui/job-autocomplete";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { supabase } from "@/lib/supabaseClient";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+import { useForm } from "react-hook-form";
 import { toast } from "sonner";
+import { z } from "zod";
 
 const applicationSchema = z.object({
     id: z.string().optional(),
@@ -198,15 +200,16 @@ export default function AddApplicationForm({
                             <FormItem>
                                 <FormLabel>Entreprise *</FormLabel>
                                 <FormControl>
-                                    <Input
-                                        placeholder="Ex: Google"
-                                        {...field}
+                                    <CompanyAutocomplete
+                                        value={field.value}
+                                        onChange={field.onChange}
                                     />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
                         )}
                     />
+
                     <FormField
                         control={form.control}
                         name="positionTitle"
@@ -214,9 +217,9 @@ export default function AddApplicationForm({
                             <FormItem>
                                 <FormLabel>Poste *</FormLabel>
                                 <FormControl>
-                                    <Input
-                                        placeholder="Ex: Développeur Full Stack"
-                                        {...field}
+                                    <JobAutocomplete
+                                        value={field.value}
+                                        onChange={field.onChange}
                                     />
                                 </FormControl>
                                 <FormMessage />
