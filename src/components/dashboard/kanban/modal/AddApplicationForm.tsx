@@ -201,7 +201,7 @@ export default function AddApplicationForm({
                                 <FormLabel>Entreprise *</FormLabel>
                                 <FormControl>
                                     <CompanyAutocomplete
-                                        value={field.value}
+                                        value={field.value || ""} 
                                         onChange={field.onChange}
                                     />
                                 </FormControl>
@@ -218,7 +218,7 @@ export default function AddApplicationForm({
                                 <FormLabel>Poste *</FormLabel>
                                 <FormControl>
                                     <JobAutocomplete
-                                        value={field.value}
+                                        value={field.value || ""} 
                                         onChange={field.onChange}
                                     />
                                 </FormControl>
@@ -239,6 +239,7 @@ export default function AddApplicationForm({
                                     <Input
                                         placeholder="https://..."
                                         {...field}
+                                        value={field.value || ""} 
                                     />
                                 </FormControl>
                                 <FormMessage />
@@ -294,6 +295,7 @@ export default function AddApplicationForm({
                                 <Textarea
                                     placeholder="Coller ici l'offre..."
                                     {...field}
+                                    value={field.value || ""}
                                 />
                             </FormControl>
                             <FormMessage />
@@ -372,6 +374,7 @@ export default function AddApplicationForm({
                                 <Textarea
                                     placeholder="Notes, suivi, contacts..."
                                     {...field}
+                                    value={field.value || ""}
                                 />
                             </FormControl>
                             <FormMessage />
@@ -390,6 +393,7 @@ export default function AddApplicationForm({
                                     <Input
                                         placeholder="Ex: 45k-55k"
                                         {...field}
+                                        value={field.value || ""}
                                     />
                                 </FormControl>
                                 <FormMessage />

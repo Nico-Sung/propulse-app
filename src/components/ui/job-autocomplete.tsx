@@ -62,7 +62,6 @@ export function JobAutocomplete({
 
                 const data = await response.json();
 
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 const jobs = (data.labelsAndRomes || []).slice(0, 10);
 
                 setSuggestions(jobs);
