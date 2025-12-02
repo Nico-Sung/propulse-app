@@ -4,6 +4,7 @@ import ThemeToggle from "@/components/design-system/theme-toggle";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Image from "next/image";
 import Link from "next/link";
+import { NotificationsMenu } from "../notifications/NotificationsMenu";
 
 interface Props {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -29,6 +30,7 @@ export function MobileHeader({ user, setIsSettingsOpen }: Props) {
                 </span>
             </Link>
             <div className="flex items-center gap-2">
+                <NotificationsMenu />
                 <ThemeToggle className="h-8 w-8 rounded-full bg-transparent hover:bg-black/5" />
                 <button onClick={() => setIsSettingsOpen(true)}>
                     <Avatar className="h-8 w-8 border-2 border-white/20 shadow-sm">

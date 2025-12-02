@@ -21,6 +21,8 @@ export interface Database {
                         | "manual";
                     show_history: boolean;
                     show_follow_ups?: boolean;
+                    email_digest?: boolean;
+                    interview_reminders?: boolean;
                     created_at: string;
                     updated_at: string;
                 };
@@ -35,6 +37,8 @@ export interface Database {
                         | "manual";
                     show_history?: boolean;
                     show_follow_ups?: boolean;
+                    email_digest?: boolean;
+                    interview_reminders?: boolean;
                     created_at?: string;
                     updated_at?: string;
                 };
@@ -49,12 +53,54 @@ export interface Database {
                         | "manual";
                     show_history?: boolean;
                     show_follow_ups?: boolean;
+                    email_digest?: boolean;
+                    interview_reminders?: boolean;
                     created_at?: string;
                     updated_at?: string;
                 };
                 Relationships: [
                     {
                         foreignKeyName: "user_preferences_user_id_fkey";
+                        columns: ["user_id"];
+                        referencedRelation: "users";
+                        referencedColumns: ["id"];
+                    }
+                ];
+            };
+            notifications: {
+                Row: {
+                    id: string;
+                    user_id: string;
+                    title: string;
+                    message: string;
+                    type: "interview" | "reminder" | "system" | "info";
+                    link: string | null;
+                    is_read: boolean;
+                    created_at: string;
+                };
+                Insert: {
+                    id?: string;
+                    user_id: string;
+                    title: string;
+                    message: string;
+                    type: "interview" | "reminder" | "system" | "info";
+                    link?: string | null;
+                    is_read?: boolean;
+                    created_at?: string;
+                };
+                Update: {
+                    id?: string;
+                    user_id?: string;
+                    title?: string;
+                    message?: string;
+                    type?: "interview" | "reminder" | "system" | "info";
+                    link?: string | null;
+                    is_read?: boolean;
+                    created_at?: string;
+                };
+                Relationships: [
+                    {
+                        foreignKeyName: "notifications_user_id_fkey";
                         columns: ["user_id"];
                         referencedRelation: "users";
                         referencedColumns: ["id"];

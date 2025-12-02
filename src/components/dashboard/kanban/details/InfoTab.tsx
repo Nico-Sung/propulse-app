@@ -34,6 +34,16 @@ export function InfoTab({
     onUpdate: () => void;
 }) {
     const [isEditing, setIsEditing] = useState(false);
+
+    const toLocalISOString = (dateString: string | null) => {
+        if (!dateString) return "";
+        const date = new Date(dateString);
+        const localDate = new Date(
+            date.getTime() - date.getTimezoneOffset() * 60000
+        );
+        return localDate.toISOString().slice(0, 16);
+    };
+
     const [formData, setFormData] = useState({
         company_name: application.company_name,
         position_title: application.position_title,
@@ -41,21 +51,28 @@ export function InfoTab({
         notes: application.notes,
         job_url: application.job_url,
         contract_type: application.contract_type,
-        deadline: (application.deadline as string) || "",
-        interview_date: (application.interview_date as string) || "",
+        deadline: application.deadline
+            ? new Date(application.deadline).toISOString().split("T")[0]
+            : "",
+        interview_date: toLocalISOString(application.interview_date as string),
         salary_range: application.salary_range,
     });
     const [loading, setLoading] = useState(false);
 
     const handleSave = async () => {
         setLoading(true);
+
+        const interviewDateUTC = formData.interview_date
+            ? new Date(formData.interview_date).toISOString()
+            : null;
+
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const { error } = await (supabase as any)
             .from("applications")
             .update({
                 ...formData,
                 deadline: formData.deadline || null,
-                interview_date: formData.interview_date || null,
+                interview_date: interviewDateUTC,
                 updated_at: new Date().toISOString(),
             })
             .eq("id", application.id);

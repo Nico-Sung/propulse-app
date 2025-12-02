@@ -24,6 +24,7 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { NotificationsMenu } from "../notifications/NotificationsMenu";
 
 const menuItems = [
     { id: "dashboard", label: "Pipeline", icon: LayoutDashboard },
@@ -110,6 +111,8 @@ export function DesktopHeader({
                 </div>
 
                 <div className="flex items-center gap-3 min-w-fit">
+                    <NotificationsMenu />
+
                     <ThemeToggle className="hover:bg-black/5 dark:hover:bg-white/10 rounded-full transition-colors h-9 w-9" />
 
                     <div className="h-4 w-px bg-foreground/10 mx-1" />

@@ -29,6 +29,10 @@ interface SettingsContextType {
     setShowHistory: (show: boolean) => void;
     showFollowUps: boolean;
     setShowFollowUps: (show: boolean) => void;
+    emailDigest: boolean;
+    setEmailDigest: (show: boolean) => void;
+    interviewReminders: boolean;
+    setInterviewReminders: (show: boolean) => void;
     loading: boolean;
 }
 
@@ -44,6 +48,8 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
     const [kanbanSort, setKanbanSortState] = useState<KanbanSort>("date_desc");
     const [showHistory, setShowHistoryState] = useState(false);
     const [showFollowUps, setShowFollowUpsState] = useState(true);
+    const [emailDigest, setEmailDigestState] = useState(true);
+    const [interviewReminders, setInterviewRemindersState] = useState(true);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -67,6 +73,10 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
                         setKanbanSortState(prefs.kanban_sort as KanbanSort);
                     setShowHistoryState(prefs.show_history ?? false);
                     setShowFollowUpsState(prefs.show_follow_ups ?? true);
+                    setEmailDigestState(prefs.email_digest ?? true);
+                    setInterviewRemindersState(
+                        prefs.interview_reminders ?? true
+                    );
                 } else if (!error) {
                     //eslint-disable-next-line @typescript-eslint/no-explicit-any
                     await (supabase as any).from("user_preferences").insert({
@@ -76,6 +86,8 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
                         kanban_sort: "date_desc",
                         show_history: false,
                         show_follow_ups: true,
+                        email_digest: true,
+                        interview_reminders: true,
                     });
                 }
             } catch (err) {
@@ -153,6 +165,16 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
         savePreference("show_follow_ups", show);
     };
 
+    const setEmailDigest = (show: boolean) => {
+        setEmailDigestState(show);
+        savePreference("email_digest", show);
+    };
+
+    const setInterviewReminders = (show: boolean) => {
+        setInterviewRemindersState(show);
+        savePreference("interview_reminders", show);
+    };
+
     return (
         <SettingsContext.Provider
             value={{
@@ -167,6 +189,10 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
                 setShowHistory,
                 showFollowUps,
                 setShowFollowUps,
+                emailDigest,
+                setEmailDigest,
+                interviewReminders,
+                setInterviewReminders,
                 loading,
             }}
         >
