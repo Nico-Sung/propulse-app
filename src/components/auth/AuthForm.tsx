@@ -1,15 +1,21 @@
 "use client";
 
-import { ArrowLeft, ArrowRight, Loader2, Mail } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { PasswordInput } from "@/components/ui/password-input";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/lib/supabaseClient";
+import {
+    ArrowLeft,
+    ArrowRight,
+    CheckCircle2,
+    Loader2,
+    Mail,
+} from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
-import { useAuth } from "../../contexts/AuthContext";
-import { supabase } from "../../lib/supabaseClient";
-import { Alert, AlertDescription } from "../ui/alert";
-import { Button } from "../ui/button";
-import { Input } from "../ui/input";
-import { Label } from "../ui/label";
-import { PasswordInput } from "../ui/password-input";
 
 type Props = {
     initialSignUp?: boolean;
@@ -28,6 +34,7 @@ export default function AuthForm({ initialSignUp = false }: Props) {
     const [fullName, setFullName] = useState("");
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
+    const [checkEmail, setCheckEmail] = useState(false);
     const { signIn, signUp } = useAuth();
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -52,8 +59,15 @@ export default function AuthForm({ initialSignUp = false }: Props) {
                     setLoading(false);
                     return;
                 }
-                const { error } = await signUp(email, password, fullName);
+                const { data, error } = await signUp(email, password, fullName);
+
                 if (error) throw error;
+
+                if (data?.user && !data.session) {
+                    setCheckEmail(true);
+                    setLoading(false);
+                    return;
+                }
             } else {
                 const { error } = await signIn(email, password);
                 if (error) throw error;
@@ -62,15 +76,58 @@ export default function AuthForm({ initialSignUp = false }: Props) {
         } catch (err: any) {
             console.error("Erreur Auth:", err);
             let message = err.message || "Une erreur est survenue";
-            if (message.includes("User already registered"))
-                message = "Cet email est déjà utilisé.";
-            if (message.includes("Invalid login credentials"))
-                message = "Identifiants incorrects.";
+
+            if (
+                message.includes("User already registered") ||
+                message.includes("duplicate key value")
+            ) {
+                message =
+                    "Cet email est déjà utilisé. Essayez de vous connecter.";
+            } else if (message.includes("Invalid login credentials")) {
+                message = "Email ou mot de passe incorrect.";
+            }
+
             setError(message);
         } finally {
-            setLoading(false);
+            if (!checkEmail) setLoading(false);
         }
     };
+
+    if (checkEmail) {
+        return (
+            <div className="w-full max-w-sm mx-auto space-y-6 animate-in fade-in zoom-in-95 duration-300">
+                <div className="flex flex-col items-center text-center space-y-4">
+                    <div className="h-16 w-16 bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 rounded-full flex items-center justify-center mb-2">
+                        <CheckCircle2 className="h-8 w-8" />
+                    </div>
+                    <h2 className="text-2xl font-semibold tracking-tight">
+                        Vérifiez vos emails
+                    </h2>
+                    <p className="text-muted-foreground">
+                        Un lien de confirmation a été envoyé à <br />
+                        <span className="font-medium text-foreground">
+                            {email}
+                        </span>
+                    </p>
+                    <div className="bg-muted/50 p-4 rounded-lg text-sm text-left w-full mt-4">
+                        <p>1. Ouvrez l&apos;email reçu de Propulse</p>
+                        <p>2. Cliquez sur le lien de confirmation</p>
+                        <p>3. Revenez ici pour vous connecter</p>
+                    </div>
+                    <Button
+                        variant="outline"
+                        className="w-full mt-4"
+                        onClick={() => {
+                            setCheckEmail(false);
+                            setView("signin");
+                        }}
+                    >
+                        Retour à la connexion
+                    </Button>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="w-full max-w-sm mx-auto space-y-6">
@@ -178,16 +235,8 @@ export default function AuthForm({ initialSignUp = false }: Props) {
 
                 {error && (
                     <Alert
-                        variant={
-                            error.includes("vérifier vos emails")
-                                ? "default"
-                                : "destructive"
-                        }
-                        className={
-                            error.includes("vérifier vos emails")
-                                ? "bg-green-500/10 text-green-600 border-green-500/20"
-                                : "bg-destructive/10 text-destructive border-destructive/20"
-                        }
+                        variant="destructive"
+                        className="bg-destructive/10 text-destructive border-destructive/20"
                     >
                         <AlertDescription>{error}</AlertDescription>
                     </Alert>

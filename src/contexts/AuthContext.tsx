@@ -1,9 +1,9 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState } from "react";
-import { User } from "@supabase/supabase-js";
-import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
+import { Session, User } from "@supabase/supabase-js";
+import { useRouter } from "next/navigation";
+import { createContext, useContext, useEffect, useState } from "react";
 
 interface AuthContextType {
     user: User | null;
@@ -12,8 +12,11 @@ interface AuthContextType {
         email: string,
         password: string,
         fullName: string
+    ) => Promise<{
+        data?: { user: User | null; session: Session | null };
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    ) => Promise<{ error: any }>;
+        error: any;
+    }>;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     signIn: (email: string, password: string) => Promise<{ error: any }>;
     signOut: () => Promise<void>;
@@ -46,8 +49,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         password: string,
         fullName: string
     ) => {
-        const { data, error } = await supabase.auth.signUp({ email, password });
-        if (!error && data.user) {
+        const { data, error } = await supabase.auth.signUp({
+            email,
+            password,
+            options: {
+                data: {
+                    full_name: fullName,
+                },
+                emailRedirectTo: `${window.location.origin}/auth/callback`,
+            },
+        });
+
+        if (error) return { data, error };
+
+        if (data.user && !data.session) {
+            return { data, error: null };
+        }
+
+        if (data.user && data.session) {
             const now = new Date().toISOString();
             const profile = {
                 id: data.user.id,
@@ -63,9 +82,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 .upsert([profile], { onConflict: "id" });
 
             if (!profileError) router.push("/dashboard");
-            return { error: profileError };
+            return { data, error: profileError };
         }
-        return { error };
+
+        return { data, error };
     };
 
     const signIn = async (email: string, password: string) => {
