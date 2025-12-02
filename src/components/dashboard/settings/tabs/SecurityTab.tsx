@@ -9,8 +9,8 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { PasswordInput } from "@/components/ui/password-input";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/lib/supabaseClient";
 import { AlertTriangle, Loader2, Lock } from "lucide-react";
@@ -143,9 +143,8 @@ export function SecurityTab() {
                             <Label htmlFor="old-password">
                                 Ancien mot de passe
                             </Label>
-                            <Input
+                            <PasswordInput
                                 id="old-password"
-                                type="password"
                                 value={oldPassword}
                                 onChange={(e) => setOldPassword(e.target.value)}
                                 className="bg-white/50 dark:bg-black/10 backdrop-blur-sm"
@@ -155,9 +154,8 @@ export function SecurityTab() {
                             <Label htmlFor="new-password">
                                 Nouveau mot de passe
                             </Label>
-                            <Input
+                            <PasswordInput
                                 id="new-password"
-                                type="password"
                                 value={newPassword}
                                 onChange={(e) => setNewPassword(e.target.value)}
                                 className="bg-white/50 dark:bg-black/10 backdrop-blur-sm"
@@ -167,9 +165,8 @@ export function SecurityTab() {
                             <Label htmlFor="confirm-password">
                                 Confirmer le nouveau
                             </Label>
-                            <Input
+                            <PasswordInput
                                 id="confirm-password"
-                                type="password"
                                 value={confirmPassword}
                                 onChange={(e) =>
                                     setConfirmPassword(e.target.value)
