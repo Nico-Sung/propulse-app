@@ -44,8 +44,8 @@ export default function LoginPage() {
 
                 <div className="mt-8 text-center">
                     <p className="text-xs text-muted-foreground">
-                        © {new Date().getFullYear()} Propulse. Tous droits
-                        réservés.
+                        © {new Date().getFullYear()} Propulse by Nicolas. Tous
+                        droits réservés.
                     </p>
                 </div>
             </div>
