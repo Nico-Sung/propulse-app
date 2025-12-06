@@ -80,7 +80,6 @@ export function WeeklyWrapped({
 }) {
     const [currentIndex, setCurrentIndex] = useState(0);
     const [dragOffset, setDragOffset] = useState(0);
-    const containerRef = useRef<HTMLDivElement>(null);
     const isDragging = useRef(false);
     const startX = useRef(0);
 
@@ -146,7 +145,6 @@ export function WeeklyWrapped({
             onMouseLeave={onMouseLeave}
         >
             <div className="absolute inset-0 bg-gradient-to-br from-primary/30 via-violet-500/20 to-secondary/30 dark:from-primary/50 dark:via-violet-500/40 dark:to-secondary/50 rounded-[2rem] pointer-events-none opacity-60 dark:opacity-80" />
-
 
             <div
                 className="absolute -top-32 -right-32 h-96 w-96 rounded-full bg-primary/20 dark:bg-primary/30 blur-[100px] pointer-events-none opacity-60 dark:opacity-70 animate-pulse"
