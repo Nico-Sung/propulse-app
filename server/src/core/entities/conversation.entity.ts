@@ -47,4 +47,13 @@ export class Conversation {
   public updateLastActivity(): void {
     this._lastMessageAt = new Date();
   }
+
+  toJSON() {
+    return {
+      id: this.id,
+      participantIds: this.participantIds,
+      createdAt: this.createdAt,
+      lastMessageAt: this.lastMessageAt,
+    };
+  }
 }
