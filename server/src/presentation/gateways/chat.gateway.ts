@@ -1,3 +1,4 @@
+// server/src/presentation/gateways/chat.gateway.ts
 import {
   ConnectedSocket,
   MessageBody,
@@ -8,15 +9,16 @@ import {
   WebSocketServer,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
+import { SendMessageUseCase } from '../../core/use-cases/message/send-message.use-case';
 
 @WebSocketGateway({ cors: { origin: '*' } })
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
   server: Server;
 
+  constructor(private readonly sendMessageUseCase: SendMessageUseCase) {}
+
   handleConnection(client: Socket) {
-    //TODO : on vérifiera plus tard le token JWT envoyé par le client
-    // const token = client.handshake.auth.token;
     console.log(`Client connecté : ${client.id}`);
   }
 
@@ -39,14 +41,33 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     };
   }
 
-  @SubscribeMessage('leaveConversation')
-  handleLeaveConversation(
+  @SubscribeMessage('sendMessage')
+  async handleSendMessage(
     @ConnectedSocket() client: Socket,
-    @MessageBody() data: { conversationId: string },
+    @MessageBody()
+    payload: { conversationId: string; content: string; senderId: string },
   ) {
-    client.leave(data.conversationId);
-    console.log(
-      `Client ${client.id} a quitté la conversation ${data.conversationId}`,
-    );
+    try {
+      console.log(
+        `📩 Reçu message de ${payload.senderId} pour ${payload.conversationId}`,
+      );
+
+      const message = await this.sendMessageUseCase.execute({
+        conversationId: payload.conversationId,
+        content: payload.content,
+        senderId: payload.senderId,
+      });
+
+      this.server
+        .to(payload.conversationId)
+        .emit('newMessage', message.toJSON());
+
+      console.log(`✅ Message envoyé et diffusé ! ID: ${message.id}`);
+
+      return { status: 'ok', messageId: message.id };
+    } catch (error) {
+      console.error(`❌ Erreur envoi message : ${error.message}`); 
+      return { status: 'error', error: error.message }; 
+    }
   }
 }
