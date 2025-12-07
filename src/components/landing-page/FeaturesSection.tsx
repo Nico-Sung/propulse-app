@@ -4,7 +4,7 @@ import {
     BarChart2,
     Calendar,
     FileText,
-    Shield,
+    MessageSquareQuote,
     Target,
     Zap,
 } from "lucide-react";
@@ -48,11 +48,11 @@ export default function FeaturesSection() {
             color: "yellow",
         },
         {
-            icon: Shield,
-            title: "Données Privées",
+            icon: MessageSquareQuote,
+            title: "Modèles de Messages",
             description:
-                "Vos données vous appartiennent. Exportez-les à tout moment. Sécurité et confidentialité garanties.",
-            color: "red",
+                "Gagnez du temps avec des modèles pré-rédigés pour vos emails de relance, messages LinkedIn et remerciements.",
+            color: "pink", 
         },
     ];
 

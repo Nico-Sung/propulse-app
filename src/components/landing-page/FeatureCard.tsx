@@ -43,6 +43,7 @@ export default function FeatureCard({
         orange: "bg-orange-500/10 text-orange-600 dark:text-orange-400 group-hover:bg-orange-500/20",
         yellow: "bg-yellow-500/10 text-yellow-600 dark:text-yellow-400 group-hover:bg-yellow-500/20",
         red: "bg-red-500/10 text-red-600 dark:text-red-400 group-hover:bg-red-500/20",
+        pink: "bg-pink-500/10 text-pink-600 dark:text-pink-400 group-hover:bg-pink-500/20", 
     };
 
     return (
@@ -73,7 +74,7 @@ export default function FeatureCard({
                 <div
                     className={cn(
                         "h-14 w-14 rounded-2xl flex items-center justify-center mb-6 transition-colors duration-300",
-                        colors[color]
+                        colors[color] || colors.blue
                     )}
                 >
                     {icon}
