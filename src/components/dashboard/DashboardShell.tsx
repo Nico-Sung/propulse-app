@@ -1,13 +1,13 @@
 "use client";
 
-import React from "react";
 import KanbanView from "@/components/views/KanbanView";
 import { useDashboardTab } from "@/contexts/DashboardTabContext";
-import DailyActionsView from "../views/DailyActionsView";
-import CalendarView from "../views/CalendarView";
-import AnalyticsView from "../views/AnalyticsView";
-import DocumentsView from "../views/DocumentView";
 import { Database } from "@/lib/database.types";
+import AnalyticsView from "../views/AnalyticsView";
+import CalendarView from "../views/CalendarView";
+import DailyActionsView from "../views/DailyActionsView";
+import DocumentsView from "../views/DocumentView";
+import TemplatesView from "../views/TemplatesView";
 import { DailyAction } from "./daily-actions/DailyActions";
 
 type Application = Database["public"]["Tables"]["applications"]["Row"];
@@ -45,6 +45,12 @@ export default function DashboardShell({
                 {tab === "documents" && (
                     <div className="w-full">
                         <DocumentsView />
+                    </div>
+                )}
+
+                {tab === "templates" && (
+                    <div className="w-full">
+                        <TemplatesView />
                     </div>
                 )}
 

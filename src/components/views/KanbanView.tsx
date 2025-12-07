@@ -1,6 +1,5 @@
 "use client";
 
-import React from "react";
 import KanbanBoard from "@/components/dashboard/kanban/KanbanBoard";
 import { Database } from "@/lib/database.types";
 

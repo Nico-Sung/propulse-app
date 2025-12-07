@@ -7,7 +7,8 @@ type TabValue =
     | "actions"
     | "calendar"
     | "analytics"
-    | "documents";
+    | "documents"
+    | "templates";
 
 type DashboardTabContextType = {
     tab: TabValue;

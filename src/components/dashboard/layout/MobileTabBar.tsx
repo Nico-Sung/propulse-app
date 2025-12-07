@@ -7,6 +7,7 @@ import {
     CheckSquare,
     FileText,
     LayoutDashboard,
+    MessageSquareQuote,
 } from "lucide-react";
 import { usePathname } from "next/navigation";
 
@@ -20,6 +21,7 @@ const menuItems = [
     { id: "actions", label: "Focus", icon: CheckSquare },
     { id: "calendar", label: "Agenda", icon: Calendar },
     { id: "documents", label: "Docs", icon: FileText },
+    { id: "templates", label: "Modèles", icon: MessageSquareQuote },
     { id: "analytics", label: "Stats", icon: BarChart3 },
 ];
 
@@ -28,7 +30,7 @@ export function MobileTabBar({ tab, handleNavigate }: Props) {
 
     return (
         <div className="md:hidden fixed bottom-6 left-0 right-0 z-50 flex justify-center px-4 pointer-events-none">
-            <nav className="pointer-events-auto flex items-center justify-around w-full max-w-sm bg-white/90 dark:bg-zinc-900/90 backdrop-blur-2xl border border-white/20 dark:border-white/10 shadow-2xl rounded-full p-2 ring-1 ring-black/5 dark:ring-white/5">
+            <nav className="pointer-events-auto flex items-center justify-between w-full max-w-md bg-white/90 dark:bg-zinc-900/90 backdrop-blur-2xl border border-white/20 dark:border-white/10 shadow-2xl rounded-full p-2 ring-1 ring-black/5 dark:ring-white/5 overflow-x-auto no-scrollbar">
                 {menuItems.map((item) => {
                     const isActive =
                         (tab === item.id && !pathname.includes("/settings")) ||
@@ -41,9 +43,9 @@ export function MobileTabBar({ tab, handleNavigate }: Props) {
                             key={item.id}
                             onClick={() => handleNavigate(item.id)}
                             className={cn(
-                                "flex flex-col items-center justify-center w-12 h-12 rounded-full transition-all duration-300 relative group",
+                                "flex flex-col items-center justify-center min-w-[3rem] h-12 rounded-full transition-all duration-300 relative group px-1",
                                 isActive
-                                    ? "text-white bg-black dark:text-black dark:bg-white shadow-lg transform -translate-y-2 scale-110"
+                                    ? "text-white bg-black dark:text-black dark:bg-white shadow-lg transform -translate-y-1 scale-105"
                                     : "text-muted-foreground hover:text-foreground active:scale-95"
                             )}
                         >

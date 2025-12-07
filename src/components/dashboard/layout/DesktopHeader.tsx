@@ -20,6 +20,7 @@ import {
     FileText,
     LayoutDashboard,
     LogOut,
+    MessageSquareQuote,
     Settings,
 } from "lucide-react";
 import Image from "next/image";
@@ -31,6 +32,7 @@ const menuItems = [
     { id: "actions", label: "Focus", icon: CheckSquare },
     { id: "calendar", label: "Agenda", icon: Calendar },
     { id: "documents", label: "Docs", icon: FileText },
+    { id: "templates", label: "Modèles", icon: MessageSquareQuote },
     { id: "analytics", label: "Stats", icon: BarChart3 },
 ];
 
@@ -76,7 +78,7 @@ export function DesktopHeader({
                 </div>
 
                 <div className="flex-1 flex justify-center max-w-2xl mx-4">
-                    <nav className="flex items-center p-1 bg-black/5 dark:bg-white/5 rounded-full backdrop-blur-md border border-white/10 dark:border-white/5 shadow-inner">
+                    <nav className="flex items-center p-1 bg-black/5 dark:bg-white/5 rounded-full backdrop-blur-md border border-white/10 dark:border-white/5 shadow-inner overflow-x-auto no-scrollbar">
                         {menuItems.map((item) => {
                             const isActive = pathname.includes("/settings")
                                 ? false
@@ -86,7 +88,7 @@ export function DesktopHeader({
                                     key={item.id}
                                     onClick={() => handleNavigate(item.id)}
                                     className={cn(
-                                        "relative px-4 py-1.5 rounded-full text-xs font-medium transition-all duration-300 flex items-center gap-2 outline-none",
+                                        "relative px-4 py-1.5 rounded-full text-xs font-medium transition-all duration-300 flex items-center gap-2 outline-none whitespace-nowrap",
                                         "text-muted-foreground hover:text-foreground hover:bg-white/10 dark:hover:bg-white/5",
                                         isActive &&
                                             "text-foreground shadow-sm data-[state=active]:bg-white dark:data-[state=active]:bg-zinc-800"
